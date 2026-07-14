@@ -6,8 +6,12 @@ Lyra convierte la búsqueda de una canción en una experiencia visual: la portad
 
 - Búsqueda por canción, artista o álbum con portadas y metadatos de Apple.
 - Letras completas o sincronizadas mediante LRCLIB.
+- Portada de entrada a pantalla completa y centro de descubrimiento enfocado.
+- Charts globales y por país, generados cada día desde los rankings públicos de Apple Music.
 - Modos Cine, Flujo y Texto para cambiar la forma de leer.
+- Modo Cine por escenas: carga por capas, una línea a la vez, portada minimizada, pausa centrada y créditos finales.
 - Paleta extraída de la portada, fondo ambiental y animación cinética por palabra.
+- Pulso visual reactivo al fragmento de audio, con animación sintética cuando no hay audio disponible.
 - Fragmentos de audio de 30 segundos con alineación manual: reproduce el fragmento y toca la línea que estás escuchando.
 - Favoritos, historial, control tipográfico y preferencia de movimiento guardados en el dispositivo.
 - Diseño adaptable, navegación por teclado y shell instalable con soporte sin conexión.
@@ -23,6 +27,8 @@ Abre `http://localhost:4173`.
 ## Publicación
 
 La aplicación es estática y está preparada para GitHub Pages. En producción consulta directamente los proveedores; al ejecutarse localmente usa el pequeño servidor incluido como intermediario.
+
+El workflow de Pages actualiza `data/charts.json` diariamente antes de publicar, evitando depender de proxies de terceros desde el navegador.
 
 ## Alcance de audio y letras
 

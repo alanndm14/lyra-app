@@ -10,13 +10,36 @@
   <meta property="og:description" content="Busca una canción y mira cómo sus palabras cobran vida." />
   <meta property="og:type" content="website" />
   <title>Lyra — Lyrics feel alive</title>
-  <link rel="manifest" href="./manifest.json?v=3" />
+  <link rel="manifest" href="./manifest.json?v=4" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=3" />
+  <link rel="stylesheet" href="./styles.css?v=4" />
 </head>
 <body>
+  <section class="entry-gate" id="entryGate" aria-label="Bienvenida a Lyra">
+    <div class="entry-card">
+      <div class="entry-grid"></div>
+      <div class="entry-glow"></div>
+      <div class="entry-copy">
+        <span class="eyebrow"><i class="live-dot"></i> LETRAS EN MOVIMIENTO</span>
+        <h1>La música también<br><em>se puede mirar.</em></h1>
+        <p>Entra a un universo donde cada portada define la luz y cada palabra encuentra su momento.</p>
+        <button class="primary-button entry-button magnetic" id="enterLyra">
+          <span>Explorar canciones</span>
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="entry-visual" aria-hidden="true">
+        <div class="entry-halo halo-one"></div>
+        <div class="entry-halo halo-two"></div>
+        <div class="entry-record"><span>LYRA<small>FEEL EVERY WORD</small></span></div>
+        <b class="entry-word ew-one">FEEL</b><b class="entry-word ew-two">LOUD</b><b class="entry-word ew-three">ALIVE</b>
+      </div>
+      <span class="entry-index">01 / ENTER THE MUSIC</span>
+    </div>
+  </section>
+
   <div class="aurora" aria-hidden="true">
     <span class="orb orb-a"></span>
     <span class="orb orb-b"></span>
@@ -25,7 +48,7 @@
   </div>
   <canvas id="particleCanvas" aria-hidden="true"></canvas>
 
-  <div class="app-shell" id="appShell">
+  <div class="app-shell" id="appShell" inert aria-hidden="true">
     <aside class="sidebar glass-panel">
       <a class="brand" href="#" aria-label="Lyra inicio">
         <span class="brand-mark"><i></i><i></i><i></i></span>
@@ -77,6 +100,21 @@
       </header>
 
       <section class="view active-view" id="discoverView">
+        <section class="discovery-command">
+          <span class="eyebrow">TU PRÓXIMA ESCENA</span>
+          <h1 id="discoveryQuestion">¿Qué quieres escuchar hoy?</h1>
+          <form class="home-search" id="homeSearchForm">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input id="homeSearchInput" type="search" autocomplete="off" placeholder="Canción, artista o álbum" aria-label="Buscar desde el inicio" />
+            <button type="submit" aria-label="Buscar"><span>Explorar</span><b>↗</b></button>
+          </form>
+          <div class="search-prompts" aria-label="Búsquedas sugeridas">
+            <button data-query="música para una noche tranquila">Noche tranquila</button>
+            <button data-query="dance pop hits">Subir el pulso</button>
+            <button data-query="indie road trip">Viaje sin destino</button>
+          </div>
+        </section>
+
         <div class="hero-grid">
           <article class="now-card tilt-card" id="nowCard">
             <div class="card-glow"></div>
@@ -170,6 +208,30 @@
           </button>
         </div>
 
+        <div class="section-heading charts-heading">
+          <div>
+            <span class="eyebrow">LO QUE EL MUNDO TIENE EN REPEAT</span>
+            <h2>Charts por país</h2>
+          </div>
+          <div class="chart-source"><i></i> APPLE MUSIC · ACTUALIZADO CADA DÍA</div>
+        </div>
+
+        <section class="charts-panel glass-panel" aria-label="Rankings musicales">
+          <div class="country-tabs" id="countryTabs" role="tablist" aria-label="Seleccionar país">
+            <button class="active" data-country="global" role="tab" aria-selected="true">Global</button>
+            <button data-country="mx" role="tab" aria-selected="false">México</button>
+            <button data-country="us" role="tab" aria-selected="false">Estados Unidos</button>
+            <button data-country="es" role="tab" aria-selected="false">España</button>
+            <button data-country="ar" role="tab" aria-selected="false">Argentina</button>
+            <button data-country="co" role="tab" aria-selected="false">Colombia</button>
+            <button data-country="gb" role="tab" aria-selected="false">Reino Unido</button>
+            <button data-country="jp" role="tab" aria-selected="false">Japón</button>
+          </div>
+          <div class="chart-list" id="chartList">
+            <div class="chart-loading"><i></i><span>Sintonizando el chart…</span></div>
+          </div>
+        </section>
+
         <div class="section-heading recent-heading">
           <div>
             <span class="eyebrow">LISTAS PARA DESPERTAR</span>
@@ -228,6 +290,22 @@
     </main>
   </div>
 
+  <aside class="environment-panel glass-panel" id="environmentPanel" aria-hidden="true">
+    <header>
+      <div><span class="eyebrow">AMBIENTE GENERAL</span><h2>Elige la luz de Lyra</h2></div>
+      <button id="environmentClose" aria-label="Cerrar ambientes">×</button>
+    </header>
+    <p>Este color acompaña la aplicación. Dentro de una canción, la portada toma el control.</p>
+    <div class="environment-presets" id="environmentPresets">
+      <button class="active" data-theme="0"><span style="--p1:#ff4ecd;--p2:#8e6cff;--p3:#25d9ff"></span><b>Neón</b><small>Rosa · violeta · cian</small></button>
+      <button data-theme="1"><span style="--p1:#ff6d3a;--p2:#ffcf48;--p3:#ff3f8b"></span><b>Solar</b><small>Coral · oro · magenta</small></button>
+      <button data-theme="2"><span style="--p1:#24e4ff;--p2:#2156ff;--p3:#9f5cff"></span><b>Cósmico</b><small>Cian · azul · ultravioleta</small></button>
+      <button data-theme="3"><span style="--p1:#f0ff6e;--p2:#3affbd;--p3:#06a7ff"></span><b>Ácido</b><small>Lima · menta · eléctrico</small></button>
+      <button data-theme="4"><span style="--p1:#ff9a9e;--p2:#cbb7ff;--p3:#8ee7f1"></span><b>Sueño</b><small>Rosa · lavanda · bruma</small></button>
+    </div>
+  </aside>
+  <div class="environment-backdrop" id="environmentBackdrop"></div>
+
   <div class="search-overlay" id="searchOverlay" aria-hidden="true">
     <div class="search-backdrop" data-close-search></div>
     <section class="search-modal glass-panel" role="dialog" aria-modal="true" aria-label="Buscar música">
@@ -283,8 +361,14 @@
   <div class="player-overlay" id="playerOverlay" aria-hidden="true">
     <div class="player-backdrop"></div>
     <section class="player-stage" role="dialog" aria-modal="true" aria-label="Reproductor de letras">
-      <button class="player-close magnetic" id="playerClose" aria-label="Cerrar reproductor">×</button>
+      <button class="player-close magnetic" id="playerClose" aria-label="Volver a resultados"><span>←</span><b>RESULTADOS</b></button>
       <div class="player-ambient" id="playerAmbient"></div>
+      <div class="cinema-vignette"></div>
+      <div class="beat-stage" id="beatStage" aria-hidden="true"></div>
+      <div class="cinema-loader" id="cinemaLoader" aria-live="polite">
+        <div class="loader-orbit"><i></i><i></i><i></i></div>
+        <span id="cinemaLoaderText">Preparando la escena…</span>
+      </div>
       <div class="player-layout">
         <aside class="track-panel glass-panel">
           <div class="track-art-wrap">
@@ -318,7 +402,7 @@
               <p><span id="previewTime">0:00</span><small id="previewLabel">FRAGMENTO · TOCA UNA LÍNEA PARA ALINEAR</small><span id="previewDuration">0:30</span></p>
             </div>
           </div>
-          <audio id="audioPreview" preload="none"></audio>
+          <audio id="audioPreview" preload="none" crossorigin="anonymous"></audio>
         </aside>
 
         <main class="lyrics-panel">
@@ -356,6 +440,13 @@
           </footer>
         </main>
       </div>
+      <div class="end-credits" id="endCredits" aria-hidden="true">
+        <div class="end-flare"></div>
+        <span>LYRA PRESENTA</span>
+        <strong>FIN</strong>
+        <p id="endTrackTitle">Una canción</p>
+        <button id="replayExperience">VOLVER A VIVIRLA ↻</button>
+      </div>
     </section>
   </div>
 
@@ -365,8 +456,9 @@
     <button class="active" data-view="discover"><span>✦</span>Inicio</button>
     <button id="mobileSearch"><span>⌕</span>Buscar</button>
     <button data-view="favorites"><span>♡</span>Guardadas</button>
+    <button id="mobileEnvironment"><span>◉</span>Ambiente</button>
   </nav>
 
-  <script src="./app.js?v=3" defer></script>
+  <script src="./app.js?v=4" defer></script>
 </body>
 </html>

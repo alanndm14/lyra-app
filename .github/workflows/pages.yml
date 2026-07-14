@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * *"
 
 permissions:
   contents: read
@@ -23,6 +25,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: actions/configure-pages@v6
+      - name: Refresh music charts
+        run: node scripts/build-charts.js
       - uses: actions/upload-pages-artifact@v5
         with:
           path: .

@@ -26,6 +26,8 @@
     youtubePlayer: null,
     youtubeReady: false,
     youtubeSyncFrame: null,
+    youtubeDuration: 0,
+    youtubeTimeScale: 1,
     youtubeMatches: readStore('lyra:youtube-matches', {}),
     youtubeLookupPending: false,
     youtubeLookupTrackId: '',
@@ -34,6 +36,8 @@
     translationLanguage: localStorage.getItem('lyra:translation-language') || '',
     translationCache: readStore('lyra:translations', {}),
     translationController: null,
+    translationRetryTimer: null,
+    translationRetryCount: 0,
     searchController: null,
     lyricsController: null,
     lyricsCache: new Map(),
@@ -42,7 +46,11 @@
     lyricsReady: false,
     hasLyrics: false,
     cinemaEnded: false,
+    cinemaSequenceReady: false,
+    cinemaSequenceTimers: [],
     beatFrame: null,
+    beatBars: [],
+    beatPaintAt: 0,
     returnToResults: false,
     motion: localStorage.getItem('lyra:motion') !== 'off',
     favorites: readStore('lyra:favorites', []),
@@ -50,6 +58,8 @@
     themeIndex: Math.max(0, Math.min(4, Number(localStorage.getItem('lyra:theme')) || 0)),
     currentView: 'discover',
     performanceLite: false,
+    visualFps: 36,
+    browserTranslators: new Map(),
   };
 
   const themes = [
@@ -108,6 +118,7 @@
     youtubeState: $('#youtubeState'),
     youtubeToggle: $('#youtubeToggle'),
     translationLanguage: $('#translationLanguage'),
+    cinemaIntro: $('#cinemaIntro'),
   };
 
   init();
@@ -151,6 +162,8 @@
     $('#replayExperience').addEventListener('click', replayExperience);
     els.translationLanguage.addEventListener('change', () => {
       state.translationLanguage = els.translationLanguage.value;
+      state.translationRetryCount = 0;
+      clearTimeout(state.translationRetryTimer);
       localStorage.setItem('lyra:translation-language', state.translationLanguage);
       translateCurrentLyrics();
     });
@@ -239,7 +252,7 @@
       const value = Number(els.lyricScrubber.value);
       state.lyricTime = state.lyricDuration * value / 100;
       if (state.youtubeReady && state.youtubePlayer?.seekTo && state.currentTrack?.youtubeVideoId) {
-        state.youtubePlayer.seekTo(state.lyricTime, true);
+        state.youtubePlayer.seekTo(lyricToVideoTime(state.lyricTime), true);
       }
       if (!els.audio.paused) state.syncAnchor = state.lyricTime - els.audio.currentTime;
       updateLyricUI(true);
@@ -327,19 +340,22 @@
   }
 
   function initBeatStage() {
-    const barCount = state.performanceLite ? 28 : 48;
+    const barCount = state.performanceLite ? 18 : 48;
     els.beatStage.innerHTML = Array.from({ length: barCount }, (_, index) => `<i style="--i:${index};--beat:.12"></i>`).join('');
+    els.beatStage.style.setProperty('--beat-columns', String(barCount));
+    state.beatBars = $$('#beatStage i');
   }
 
   function initPerformanceProfile() {
-    const desktop = matchMedia('(pointer:fine)').matches && innerWidth >= 900;
+    const mobile = matchMedia('(pointer:coarse)').matches || innerWidth < 900;
     const largeCanvas = innerWidth * innerHeight >= 1500000;
     const constrainedHardware = Number(navigator.deviceMemory || 8) <= 4 || Number(navigator.hardwareConcurrency || 8) <= 4;
-    setPerformanceLite(desktop && (largeCanvas || constrainedHardware));
+    setPerformanceLite(mobile || largeCanvas || constrainedHardware);
   }
 
   function setPerformanceLite(enabled) {
     state.performanceLite = Boolean(enabled);
+    state.visualFps = state.performanceLite ? 24 : 36;
     document.body.classList.toggle('performance-lite', state.performanceLite);
     window.dispatchEvent(new CustomEvent('lyra:performance', { detail: state.performanceLite }));
   }
@@ -469,15 +485,16 @@
   }
 
   function openPlayer(sourceElement = null) {
-    els.playerOverlay.classList.remove('closing', 'playing', 'paused', 'ended', 'background-ready', 'lyrics-ready', 'no-lyrics');
-    els.playerOverlay.classList.add('phase-loading');
+    clearCinemaSequence();
+    els.playerOverlay.classList.remove('closing', 'playing', 'paused', 'ended', 'background-ready', 'lyrics-ready', 'no-lyrics', 'intro-presenting', 'intro-metadata', 'intro-syncing', 'intro-ready');
+    els.playerOverlay.classList.add('phase-loading', 'phase-black');
     els.playerOverlay.classList.toggle('cinema-active', state.lyricMode === 'cinematic');
     els.endCredits.setAttribute('aria-hidden', 'true');
     els.playerOverlay.classList.add('open');
     els.playerOverlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     monitorFrameHealth();
-    if (sourceElement) animateTrackPortal(state.currentTrack, sourceElement);
+    startCinemaSequence();
   }
 
   function closePlayer() {
@@ -485,14 +502,16 @@
     els.playerOverlay.setAttribute('aria-hidden', 'true');
     stopLyricPlayback(false);
     els.audio.pause();
+    state.audioContext?.suspend?.().catch?.(() => {});
     stopYouTubeSync();
     destroyYouTubePlayer();
+    clearCinemaSequence();
     state.youtubeReady = false;
     state.audioSync = false;
     els.previewPlayer.classList.remove('playing');
     setTheme(themes[state.themeIndex] || themes[0]);
     setTimeout(() => {
-      els.playerOverlay.classList.remove('open', 'closing', 'playing', 'paused', 'ended', 'phase-loading', 'background-ready', 'lyrics-ready');
+      els.playerOverlay.classList.remove('open', 'closing', 'playing', 'paused', 'ended', 'phase-loading', 'phase-black', 'intro-presenting', 'intro-metadata', 'intro-syncing', 'intro-ready', 'background-ready', 'lyrics-ready');
       document.body.style.overflow = '';
     }, state.motion ? 520 : 0);
   }
@@ -516,6 +535,40 @@
     document.body.appendChild(portal);
     requestAnimationFrame(() => portal.classList.add('traveling'));
     setTimeout(() => portal.remove(), state.motion ? 880 : 0);
+  }
+
+  function clearCinemaSequence() {
+    state.cinemaSequenceTimers.forEach(clearTimeout);
+    state.cinemaSequenceTimers = [];
+    state.cinemaSequenceReady = false;
+  }
+
+  function startCinemaSequence() {
+    clearCinemaSequence();
+    const overlay = els.playerOverlay;
+    const schedule = (delay, callback) => {
+      const timer = setTimeout(() => {
+        if (!overlay.classList.contains('open')) return;
+        callback();
+      }, state.motion ? delay : Math.min(delay, 40));
+      state.cinemaSequenceTimers.push(timer);
+    };
+    schedule(620, () => overlay.classList.add('intro-presenting'));
+    schedule(1550, () => {
+      overlay.classList.remove('phase-black', 'intro-presenting');
+      overlay.classList.add('intro-metadata');
+    });
+    schedule(2350, () => {
+      overlay.classList.remove('intro-metadata');
+      overlay.classList.add('intro-syncing');
+      els.cinemaLoaderText.textContent = 'Sincronizando letra y escena...';
+    });
+    schedule(3200, () => {
+      overlay.classList.remove('intro-syncing');
+      overlay.classList.add('intro-ready');
+      state.cinemaSequenceReady = true;
+      revealCinemaWhenReady();
+    });
   }
 
   function runSearch(query) {
@@ -728,6 +781,8 @@
     stopLyricPlayback();
     els.audio.pause();
     state.currentTrack = track;
+    state.lyricMode = 'cinematic';
+    $$('.control-pill').forEach(button => button.classList.toggle('active', button.dataset.mode === 'cinematic'));
     state.lyrics = [];
     state.plainLyrics = '';
     state.lyricTime = 0;
@@ -742,6 +797,8 @@
     state.lyricsReady = false;
     state.hasLyrics = false;
     state.cinemaEnded = false;
+    state.youtubeDuration = 0;
+    state.youtubeTimeScale = 1;
     updateFavoriteButton();
     renderTrackMeta(track);
     applyTrackTheme(track).finally(() => {
@@ -832,6 +889,7 @@
       $('#lyricsKicker').textContent = 'SIN LETRA · MODO AMBIENTE';
       $('#lyricsHeading').textContent = 'La portada y el pulso toman la escena.';
       state.lyricsReady = true;
+      refreshYouTubeTiming();
       revealCinemaWhenReady();
       return;
     }
@@ -854,11 +912,12 @@
     );
     renderLyrics();
     state.lyricsReady = true;
+    refreshYouTubeTiming();
     revealCinemaWhenReady();
   }
 
   function revealCinemaWhenReady() {
-    if (!state.backgroundReady || !state.lyricsReady) return;
+    if (!state.backgroundReady || !state.lyricsReady || !state.cinemaSequenceReady) return;
     setTimeout(() => {
       if (!els.playerOverlay.classList.contains('open')) return;
       els.playerOverlay.classList.remove('phase-loading');
@@ -954,11 +1013,16 @@
     if (fallbackCopy) fallbackCopy.textContent = 'Buscando reproducción disponible…';
     try {
       if (isRetry) delete state.youtubeMatches[trackId(track)];
-      const cached = state.youtubeMatches[trackId(track)];
+      let cached = state.youtubeMatches[trackId(track)];
+      if (cached?.durationMs && track.durationMs && Math.abs(Number(cached.durationMs) - Number(track.durationMs)) > 35000) {
+        delete state.youtubeMatches[trackId(track)];
+        cached = null;
+      }
       if (cached?.videoId) {
         Object.assign(track, {
           youtubeVideoId: cached.videoId,
           youtubeTrackViewUrl: `https://www.youtube.com/watch?v=${encodeURIComponent(cached.videoId)}`,
+          youtubeDurationMs: Number(cached.durationMs || 0),
           durationMs: track.durationMs || Number(cached.durationMs || 0),
           source: `${track.source || 'catalog'}+youtube`,
         });
@@ -966,12 +1030,17 @@
         return;
       }
       const candidates = await searchYouTube(`${track.title} ${track.artist} official audio`, controller.signal, true);
-      const match = mergeSearchResults([], candidates, `${track.title} ${track.artist}`)[0];
+      const rankedMatches = mergeSearchResults([], candidates, `${track.title} ${track.artist}`);
+      const targetDuration = Number(track.durationMs || 0);
+      const match = targetDuration
+        ? rankedMatches.find(candidate => candidate.durationMs && Math.abs(candidate.durationMs - targetDuration) <= 22000) || rankedMatches[0]
+        : rankedMatches[0];
       if (!match) throw new Error('No embeddable YouTube match');
       if (state.currentTrack !== track) return;
       Object.assign(track, {
         youtubeVideoId: match.youtubeVideoId,
         youtubeTrackViewUrl: match.trackViewUrl,
+        youtubeDurationMs: Number(match.durationMs || 0),
         durationMs: track.durationMs || match.durationMs,
         source: `${track.source || 'catalog'}+youtube`,
       });
@@ -1078,7 +1147,8 @@
         events: {
           onReady: () => {
             state.youtubeReady = true;
-            if (state.lyricTime > .15) state.youtubePlayer?.seekTo?.(state.lyricTime, true);
+            refreshYouTubeTiming();
+            if (state.lyricTime > .15) state.youtubePlayer?.seekTo?.(lyricToVideoTime(state.lyricTime), true);
             els.youtubeState.textContent = 'YOUTUBE · LISTO';
             setYouTubeControlState('ready');
             setUnifiedPlaybackState(false, 'Reproducir video y letra');
@@ -1186,6 +1256,7 @@
       const player = state.youtubePlayer;
       if (!player?.getCurrentTime) return;
       const currentTime = Number(player.getCurrentTime()) || 0;
+      refreshYouTubeTiming();
       const activeVideoId = player.getVideoData?.()?.video_id || '';
       const isRequestedVideo = activeVideoId === state.currentTrack?.youtubeVideoId;
       if (!isRequestedVideo) {
@@ -1194,19 +1265,41 @@
       } else if (state.hasLyrics && currentTime > .15) {
         state.audioSync = true;
         els.youtubeState.textContent = 'YOUTUBE · LETRA SINCRONIZADA';
-        state.lyricTime = Math.max(0, Math.min(state.lyricDuration, currentTime));
+        state.lyricTime = videoToLyricTime(currentTime);
         updateLyricUI();
       }
-      if (isRequestedVideo) updateBeatVisual(currentTime);
-      state.youtubeSyncFrame = requestAnimationFrame(tick);
+      state.youtubeSyncFrame = setTimeout(tick, visualFrameDelay());
     };
-    state.youtubeSyncFrame = requestAnimationFrame(tick);
+    state.youtubeSyncFrame = setTimeout(tick, visualFrameDelay());
   }
 
   function stopYouTubeSync() {
-    if (state.youtubeSyncFrame) cancelAnimationFrame(state.youtubeSyncFrame);
+    if (state.youtubeSyncFrame) clearTimeout(state.youtubeSyncFrame);
     state.youtubeSyncFrame = null;
     state.audioSync = false;
+  }
+
+  function refreshYouTubeTiming() {
+    const duration = Number(state.youtubePlayer?.getDuration?.()) || Number(state.currentTrack?.youtubeDurationMs || 0) / 1000;
+    if (duration < 10) return;
+    state.youtubeDuration = duration;
+    const lyricDuration = Number(state.lyricDuration || 0);
+    state.youtubeTimeScale = lyricDuration >= 10
+      ? Math.max(.75, Math.min(1.25, lyricDuration / duration))
+      : 1;
+  }
+
+  function videoToLyricTime(videoTime) {
+    return Math.max(0, Math.min(state.lyricDuration, Number(videoTime || 0) * state.youtubeTimeScale));
+  }
+
+  function lyricToVideoTime(lyricTime) {
+    const scale = state.youtubeTimeScale || 1;
+    return Math.max(0, Math.min(state.youtubeDuration || Infinity, Number(lyricTime || 0) / scale));
+  }
+
+  function visualFrameDelay() {
+    return Math.round(1000 / Math.max(1, state.visualFps));
   }
 
   function destroyYouTubePlayer() {
@@ -1294,11 +1387,19 @@
         node.textContent = translation ? `(${translation})` : '';
         node.hidden = !translation;
       });
+      state.translationRetryCount = 0;
       setTranslationState('TRADUCIDA', false);
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.error(error);
-        setTranslationState('REINTENTAR', false);
+        if (state.translationRetryCount < 2 && state.translationLanguage === language) {
+          state.translationRetryCount += 1;
+          setTranslationState('RECONECTANDO', true);
+          clearTimeout(state.translationRetryTimer);
+          state.translationRetryTimer = setTimeout(() => translateCurrentLyrics(), 2500 * state.translationRetryCount);
+        } else {
+          setTranslationState('REINTENTAR', false);
+        }
         showToast('La traducción no respondió. La letra original sigue disponible.');
       }
     } finally {
@@ -1354,6 +1455,94 @@
   }
 
   async function requestTranslation(text, language, signal) {
+    if (!String(text || '').trim()) return '';
+    try {
+      const localTranslation = await withTimeout(requestBrowserTranslation(text, language, signal), 4500, signal);
+      if (localTranslation) return localTranslation;
+    } catch (error) {
+      if (error.name === 'AbortError') throw error;
+      console.info('Local translation unavailable; using network fallback', error);
+    }
+
+    let lastError;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        return await requestNetworkTranslation(text, language, signal);
+      } catch (error) {
+        if (error.name === 'AbortError') throw error;
+        lastError = error;
+        if (attempt < 2) await abortableDelay(450 * (attempt + 1), signal);
+      }
+    }
+    throw lastError || new Error('Translation unavailable');
+  }
+
+  async function requestBrowserTranslation(text, language, signal) {
+    if (!window.Translator?.create || !window.LanguageDetector?.create) return '';
+    const detector = await window.LanguageDetector.create();
+    const detected = await detector.detect(String(text).slice(0, 1200));
+    detector.destroy?.();
+    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+    const sourceLanguage = detected?.[0]?.detectedLanguage;
+    if (!sourceLanguage || sourceLanguage === 'und') return '';
+    if (sourceLanguage === language) return String(text);
+    const key = `${sourceLanguage}|${language}`;
+    let translator = state.browserTranslators.get(key);
+    if (!translator) {
+      translator = await window.Translator.create({ sourceLanguage, targetLanguage: language });
+      state.browserTranslators.set(key, translator);
+    }
+    const translated = await translator.translate(String(text));
+    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+    return String(translated || '').trim();
+  }
+
+  function abortableDelay(ms, signal) {
+    return new Promise((resolve, reject) => {
+      if (signal.aborted) return reject(new DOMException('Aborted', 'AbortError'));
+      const timer = setTimeout(resolve, ms);
+      signal.addEventListener('abort', () => {
+        clearTimeout(timer);
+        reject(new DOMException('Aborted', 'AbortError'));
+      }, { once: true });
+    });
+  }
+
+  function withTimeout(promise, ms, signal) {
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      let timer;
+      const finish = (callback, value) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        signal.removeEventListener('abort', abort);
+        callback(value);
+      };
+      const abort = () => finish(reject, new DOMException('Aborted', 'AbortError'));
+      timer = setTimeout(() => finish(reject, new Error('Local translator timeout')), ms);
+      signal.addEventListener('abort', abort, { once: true });
+      Promise.resolve(promise).then(value => finish(resolve, value), error => finish(reject, error));
+    });
+  }
+
+  async function requestNetworkTranslation(text, language, signal) {
+    try {
+      const params = new URLSearchParams({ client: 'gtx', sl: 'auto', tl: language, dt: 't', q: text });
+      const response = await fetchWithDeadline(`https://translate.googleapis.com/translate_a/single?${params}`, { signal }, 9000);
+      if (!response.ok) throw new Error(`Primary translation failed ${response.status}`);
+      const data = await response.json();
+      const translated = Array.isArray(data?.[0]) ? data[0].map(part => part?.[0] || '').join('') : '';
+      if (translated.trim()) return translated;
+      throw new Error('Primary translation returned no text');
+    } catch (error) {
+      if (error.name === 'AbortError') throw error;
+      console.info('Primary translation unavailable; using secondary provider', error);
+      return requestMyMemoryTranslation(text, language, signal);
+    }
+  }
+
+  async function requestMyMemoryTranslation(text, language, signal) {
     if (!text.trim() || text.trim() === '♪') return '';
     const params = new URLSearchParams({ q: text, langpair: `autodetect|${language}` });
     const response = await fetchWithDeadline(`https://api.mymemory.translated.net/get?${params}`, { signal }, 10000);
@@ -1390,7 +1579,8 @@
       else break;
     }
 
-    if (activeIndex !== state.activeLyricIndex) {
+    const lineChanged = activeIndex !== state.activeLyricIndex;
+    if (lineChanged) {
       state.lyricElements.forEach((line, index) => {
         line.classList.toggle('active', index === activeIndex);
         line.classList.toggle('past', index < activeIndex);
@@ -1420,7 +1610,7 @@
     }
 
     const active = state.lyricElements[activeIndex];
-    if (active && (forceScroll || state.lyricPlaying || state.audioSync) && state.lyricMode === 'flow') {
+    if (active && (forceScroll || lineChanged) && state.lyricMode === 'flow') {
       const target = active.offsetTop - els.lyricsViewport.clientHeight / 2 + active.offsetHeight / 2;
       els.lyricsViewport.scrollTo({ top: Math.max(0, target), behavior: state.motion ? 'smooth' : 'auto' });
     }
@@ -1478,16 +1668,16 @@
       state.lyricTime += (now - previous) / 1000;
       previous = now;
       updateLyricUI();
-      state.lyricTimer = requestAnimationFrame(tick);
+      state.lyricTimer = setTimeout(() => tick(performance.now()), visualFrameDelay());
     };
-    state.lyricTimer = requestAnimationFrame(tick);
+    state.lyricTimer = setTimeout(() => tick(performance.now()), visualFrameDelay());
   }
 
   function stopLyricPlayback(presentPause = true) {
     state.lyricPlaying = false;
     els.lyricTimeline.classList.remove('playing');
     els.lyricPlay.setAttribute('aria-label', 'Reproducir animación de letra');
-    if (state.lyricTimer) cancelAnimationFrame(state.lyricTimer);
+    if (state.lyricTimer) clearTimeout(state.lyricTimer);
     state.lyricTimer = null;
     if (presentPause && els.playerOverlay.classList.contains('open') && !state.cinemaEnded) {
       els.playerOverlay.classList.remove('playing');
@@ -1528,9 +1718,12 @@
   function updateBeatVisual(time) {
     const youtubePlaying = state.youtubePlayer?.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
     if (!els.beatStage || (!state.lyricPlaying && els.audio.paused && !youtubePlaying)) return;
+    const now = performance.now();
+    if (now - state.beatPaintAt < visualFrameDelay() * .9) return;
+    state.beatPaintAt = now;
     if (state.audioAnalyser && state.audioData && !els.audio.paused) state.audioAnalyser.getByteFrequencyData(state.audioData);
     const audioEnergy = els.audio.paused ? 0 : .18 + Math.abs(Math.sin(els.audio.currentTime * 5.6)) * .58;
-    const bars = $$('#beatStage i');
+    const bars = state.beatBars;
     bars.forEach((bar, index) => {
       const wave = Math.abs(Math.sin(time * (2.1 + index % 5 * .13) + index * .72));
       const kick = Math.pow(Math.max(0, Math.sin(time * 3.25 - index * .08)), 6);
@@ -1545,13 +1738,13 @@
     const tick = () => {
       if (els.audio.paused) return;
       updateBeatVisual(els.audio.currentTime);
-      state.beatFrame = requestAnimationFrame(tick);
+      state.beatFrame = setTimeout(tick, visualFrameDelay());
     };
-    state.beatFrame = requestAnimationFrame(tick);
+    state.beatFrame = setTimeout(tick, visualFrameDelay());
   }
 
   function stopBeatLoop() {
-    if (state.beatFrame) cancelAnimationFrame(state.beatFrame);
+    if (state.beatFrame) clearTimeout(state.beatFrame);
     state.beatFrame = null;
   }
 
@@ -1625,6 +1818,7 @@
 
   function endAudioSync() {
     stopBeatLoop();
+    state.audioContext?.suspend?.().catch?.(() => {});
     state.audioSync = false;
     els.previewPlayer.classList.remove('playing');
     els.previewTimelinePlay.classList.remove('playing');

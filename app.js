@@ -1012,9 +1012,9 @@
       button.dataset.index = String(index);
       button.setAttribute('aria-label', line.text || 'Pausa musical');
       const words = String(line.text || '♪').split(/\s+/).filter(Boolean);
-      button.innerHTML = `<span class="lyric-primary">${words.map((word, wordIndex) =>
+      button.innerHTML = `${words.map((word, wordIndex) =>
         `<span class="lyric-token" style="--token:${wordIndex};--tokens:${words.length}">${escapeHtml(word)}</span>`
-      ).join('')}</span><small class="lyric-translation" hidden></small>`;
+      ).join(' ')}<small class="lyric-translation" hidden></small>`;
       button.addEventListener('click', () => {
         state.lyricTime = line.time;
         if (!els.audio.paused) {

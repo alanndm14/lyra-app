@@ -851,7 +851,6 @@ body.app-entered .app-shell { opacity:1; transform:none; }
 .preview-timeline-play span { font:800 7px/1 "Manrope"; letter-spacing:.12em; }
 .preview-timeline-play.playing { color:#090810; background:linear-gradient(110deg,var(--lyric-hot),var(--lyric-soft)); border-color:transparent; }
 .preview-timeline-play.playing i { width:7px; height:9px; border:0; background:linear-gradient(90deg,currentColor 0 35%,transparent 35% 65%,currentColor 65%); }
-.lyric-primary { display:inline; }
 .lyric-translation { display:block; width:100%; margin-top:.55em; color:color-mix(in srgb,var(--lyric-soft) 48%,#fff); font:650 .25em/1.25 "Manrope"; letter-spacing:-.015em; text-wrap:balance; text-shadow:0 0 20px color-mix(in srgb,var(--lyric-hot) 22%,transparent); }
 .lyric-translation[hidden] { display:none!important; }
 

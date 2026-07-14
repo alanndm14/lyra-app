@@ -17,7 +17,8 @@ for (const id of ['entryGate', 'appShell', 'chartList', 'playerOverlay', 'beatSt
   assert(ids.includes(id), `Missing required UI id: ${id}`);
 }
 
-assert(html.includes('styles.css?v=6') && html.includes('app.js?v=6') && html.includes('runtime-config.js?v=6'), 'Public asset versions are not aligned');
+assert(html.includes('styles.css?v=7') && html.includes('app.js?v=7') && html.includes('runtime-config.js?v=7'), 'Public asset versions are not aligned');
+assert(app.includes(".join(' ')}<small class=\"lyric-translation\""), 'Lyric words are rendered without explicit spaces');
 assert(app.includes('itunes.apple.com/lookup?'), 'Chart entries are not resolved through exact catalog lookup');
 assert(app.includes('googleapis.com/youtube/v3/search'), 'YouTube search fallback is missing');
 assert(app.includes('api.mymemory.translated.net/get'), 'Lyrics translation provider is missing');

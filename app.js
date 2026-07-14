@@ -600,18 +600,19 @@
 
   async function searchYouTube(query, signal, force = false) {
     if (!youtubeApiKey || (!force && state.filter === 'album')) return [];
+    const requestOptions = youtubeRequestOptions(signal);
     const searchParams = new URLSearchParams({
       part: 'snippet', type: 'video', videoEmbeddable: 'true', videoSyndicated: 'true',
       maxResults: '12', q: query, key: youtubeApiKey,
     });
-    const response = await fetchWithDeadline(`https://www.googleapis.com/youtube/v3/search?${searchParams}`, { signal }, 9000);
+    const response = await fetchWithDeadline(`https://www.googleapis.com/youtube/v3/search?${searchParams}`, requestOptions, 9000);
     if (!response.ok) throw new Error(`YouTube search failed ${response.status}`);
     const items = (await response.json()).items || [];
     const ids = items.map(item => item.id?.videoId).filter(Boolean);
     if (!ids.length) return [];
     try {
       const detailParams = new URLSearchParams({ part: 'snippet,contentDetails,status', id: ids.join(','), key: youtubeApiKey });
-      const detailResponse = await fetchWithDeadline(`https://www.googleapis.com/youtube/v3/videos?${detailParams}`, { signal }, 9000);
+      const detailResponse = await fetchWithDeadline(`https://www.googleapis.com/youtube/v3/videos?${detailParams}`, requestOptions, 9000);
       if (!detailResponse.ok) throw new Error(`YouTube details failed ${detailResponse.status}`);
       const detailed = ((await detailResponse.json()).items || [])
         .filter(item => item.status?.embeddable !== false)
@@ -622,6 +623,14 @@
       console.warn('YouTube details unavailable; using search results', error);
     }
     return items.map(normalizeYouTubeTrack).filter(track => track.youtubeVideoId);
+  }
+
+  function youtubeRequestOptions(signal) {
+    return {
+      signal,
+      referrer: new URL('./', location.href).href,
+      referrerPolicy: 'unsafe-url',
+    };
   }
 
   function normalizeYouTubeTrack(item) {
@@ -907,13 +916,14 @@
     destroyYouTubePlayer();
     const hasPreview = Boolean(track.previewUrl);
     const hasYouTube = Boolean(track.youtubeVideoId);
-    els.playerOverlay.classList.toggle('has-youtube', hasYouTube);
+    const hasVideoSlot = hasYouTube || Boolean(youtubeApiKey);
+    els.playerOverlay.classList.toggle('has-youtube', hasVideoSlot);
     $('#previewPlayer').style.display = hasPreview ? 'flex' : 'none';
     els.previewTimelinePlay.hidden = !hasPreview;
     els.youtubeToggle.hidden = false;
     setYouTubeControlState(hasYouTube ? 'ready' : youtubeApiKey ? 'searching' : 'external');
-    els.youtubePlayerShell.hidden = !hasYouTube;
-    els.mediaFallback.hidden = hasPreview || hasYouTube;
+    els.youtubePlayerShell.hidden = !hasVideoSlot;
+    els.mediaFallback.hidden = hasPreview || hasVideoSlot;
     if (hasYouTube) {
       renderYouTubeEmbed(track.youtubeVideoId, track.title, track.artist);
       mountYouTubePlayer(track.youtubeVideoId);
@@ -971,8 +981,8 @@
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.warn('YouTube fallback unavailable', error);
-        els.youtubeState.textContent = isRetry ? 'YOUTUBE · ABRIR BÚSQUEDA' : 'YOUTUBE · TOCA PARA REINTENTAR';
-        setYouTubeControlState(isRetry ? 'external' : 'error');
+        els.youtubeState.textContent = 'YOUTUBE · NO SE PUDO CARGAR · TOCA REINTENTAR';
+        setYouTubeControlState('error');
       }
     } finally {
       if (state.youtubeLookupToken === lookupToken) {
@@ -1021,6 +1031,7 @@
       ready: 'VIDEO + LETRA',
       playing: 'VIDEO + LETRA',
       error: 'REINTENTAR VIDEO',
+      native: 'VIDEO EN PANTALLA',
       external: 'ABRIR YOUTUBE',
     };
     els.youtubeToggle.hidden = false;
@@ -1028,6 +1039,8 @@
     els.youtubeToggle.classList.toggle('searching', controlState === 'searching');
     els.youtubeToggle.classList.toggle('error', controlState === 'error' || controlState === 'external');
     els.youtubeToggle.classList.toggle('playing', controlState === 'playing');
+    els.youtubePlayerShell.classList.toggle('pending', controlState === 'searching');
+    els.youtubePlayerShell.classList.toggle('lookup-error', controlState === 'error');
     const label = $('span', els.youtubeToggle);
     if (label) label.textContent = labels[controlState] || 'VIDEO';
   }
@@ -1073,18 +1086,18 @@
           onStateChange: onYouTubeStateChange,
           onError: () => {
             state.youtubeReady = false;
-            setUnifiedPlaybackState(false, 'Abrir video en YouTube');
+            setUnifiedPlaybackState(false, 'Reintentar video dentro de Lyra');
             els.youtubeState.textContent = 'YOUTUBE · VIDEO BLOQUEADO O NO DISPONIBLE';
-            setYouTubeControlState('external');
+            setYouTubeControlState('error');
           },
         },
       });
     } catch (error) {
       console.error(error);
       state.youtubeReady = false;
-      setUnifiedPlaybackState(false, 'Abrir video en YouTube');
-      els.youtubeState.textContent = 'YOUTUBE · ABRIR EN YOUTUBE';
-      setYouTubeControlState('external');
+      setUnifiedPlaybackState(false, 'Usar controles del video');
+      els.youtubeState.textContent = 'YOUTUBE · CONTROLES DEL VIDEO DISPONIBLES';
+      setYouTubeControlState('native');
     }
   }
 
@@ -1117,15 +1130,31 @@
   }
 
   function toggleYouTubeVideo() {
+    const controlState = els.youtubeToggle.dataset.state;
+    if (controlState === 'error') {
+      const track = state.currentTrack;
+      if (!track || !youtubeApiKey) return;
+      destroyYouTubePlayer();
+      delete state.youtubeMatches[trackId(track)];
+      delete track.youtubeVideoId;
+      delete track.youtubeTrackViewUrl;
+      writeStore('lyra:youtube-matches', state.youtubeMatches);
+      enrichCurrentTrackWithYouTube(track, true);
+      showToast('Buscando otro video insertable…');
+      return;
+    }
     const player = state.youtubePlayer;
     if (!player?.getPlayerState) {
-      const controlState = els.youtubeToggle.dataset.state;
       if (controlState === 'external') {
         window.open(state.currentTrack?.youtubeTrackViewUrl || els.youtubeSearchLink.href, '_blank', 'noopener,noreferrer');
         return;
       }
       if (state.youtubeLookupPending) {
         showToast('Buscando el video oficial…');
+        return;
+      }
+      if (controlState === 'native') {
+        showToast('Usa los controles visibles dentro del video.');
         return;
       }
       if (state.currentTrack && youtubeApiKey) {

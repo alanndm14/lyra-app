@@ -17,7 +17,7 @@ for (const id of ['entryGate', 'appShell', 'chartList', 'playerOverlay', 'beatSt
   assert(ids.includes(id), `Missing required UI id: ${id}`);
 }
 
-assert(html.includes('styles.css?v=10') && html.includes('app.js?v=10') && html.includes('runtime-config.js?v=10'), 'Public asset versions are not aligned');
+assert(html.includes('styles.css?v=11') && html.includes('app.js?v=11') && html.includes('runtime-config.js?v=11'), 'Public asset versions are not aligned');
 assert(app.includes(".join(' ')}<small class=\"lyric-translation\""), 'Lyric words are rendered without explicit spaces');
 assert(app.includes('itunes.apple.com/lookup?'), 'Chart entries are not resolved through exact catalog lookup');
 assert(app.includes('googleapis.com/youtube/v3/search'), 'YouTube search fallback is missing');
@@ -28,6 +28,8 @@ assert(app.includes('setYouTubeControlState') && app.includes('initPerformancePr
 assert(css.includes('body.performance-lite .player-stage::before'), 'Desktop performance profile styles are missing');
 assert(app.includes('state.youtubeController?.abort()') && app.includes("isRetry ? 'external' : 'error'"), 'YouTube retry isolation or terminal fallback is missing');
 assert(css.includes('.player-overlay.cinema-active .track-panel { min-height:0; }'), 'Mobile cinema cards can still inherit full-screen minimum height');
+assert(app.includes('renderYouTubeEmbed(track.youtubeVideoId') && app.includes("seekTo(state.lyricTime, true)"), 'Embedded YouTube transport is not unified with lyrics');
+assert(app.includes("const marker = '[[[LYRA_BREAK]]]'" ) && app.includes("setTranslationState('TRADUCIENDO'"), 'Reliable translation batching or status is missing');
 assert(app.includes('api.mymemory.translated.net/get'), 'Lyrics translation provider is missing');
 assert(app.includes("writeStore('lyra:preview-offsets'"), 'Per-track preview alignment is not persisted');
 assert(!app.includes("text: 'Esta letra todavía no está disponible.'"), 'A placeholder is still being animated as lyrics');

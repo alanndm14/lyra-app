@@ -29,6 +29,7 @@
     youtubeLookupPending: false,
     youtubeLookupTrackId: '',
     youtubeLookupToken: null,
+    youtubeController: null,
     translationLanguage: localStorage.getItem('lyra:translation-language') || '',
     translationCache: readStore('lyra:translations', {}),
     translationController: null,
@@ -600,16 +601,24 @@
     const items = (await response.json()).items || [];
     const ids = items.map(item => item.id?.videoId).filter(Boolean);
     if (!ids.length) return [];
-    const detailParams = new URLSearchParams({ part: 'snippet,contentDetails,status', id: ids.join(','), key: youtubeApiKey });
-    const detailResponse = await fetchWithDeadline(`https://www.googleapis.com/youtube/v3/videos?${detailParams}`, { signal }, 9000);
-    if (!detailResponse.ok) throw new Error(`YouTube details failed ${detailResponse.status}`);
-    return ((await detailResponse.json()).items || [])
-      .filter(item => item.status?.embeddable !== false)
-      .map(normalizeYouTubeTrack);
+    try {
+      const detailParams = new URLSearchParams({ part: 'snippet,contentDetails,status', id: ids.join(','), key: youtubeApiKey });
+      const detailResponse = await fetchWithDeadline(`https://www.googleapis.com/youtube/v3/videos?${detailParams}`, { signal }, 9000);
+      if (!detailResponse.ok) throw new Error(`YouTube details failed ${detailResponse.status}`);
+      const detailed = ((await detailResponse.json()).items || [])
+        .filter(item => item.status?.embeddable !== false)
+        .map(normalizeYouTubeTrack);
+      if (detailed.length) return detailed;
+    } catch (error) {
+      if (error.name === 'AbortError') throw error;
+      console.warn('YouTube details unavailable; using search results', error);
+    }
+    return items.map(normalizeYouTubeTrack).filter(track => track.youtubeVideoId);
   }
 
   function normalizeYouTubeTrack(item) {
     const snippet = item.snippet || {};
+    const videoId = typeof item.id === 'string' ? item.id : item.id?.videoId || '';
     const rawTitle = decodeEntities(snippet.title || 'Video musical');
     const cleanTitle = rawTitle
       .replace(/\s*[|｜].*$/, '')
@@ -621,17 +630,17 @@
     const thumbnails = snippet.thumbnails || {};
     const artwork = thumbnails.maxres?.url || thumbnails.standard?.url || thumbnails.high?.url || thumbnails.medium?.url || thumbnails.default?.url || '';
     return {
-      id: `youtube:${item.id}`,
+      id: `youtube:${videoId}`,
       title,
       artist,
       album: 'YouTube',
       artworkUrl: artwork,
       previewUrl: '',
       durationMs: parseIsoDuration(item.contentDetails?.duration) * 1000,
-      trackViewUrl: `https://www.youtube.com/watch?v=${encodeURIComponent(item.id)}`,
+      trackViewUrl: `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`,
       releaseDate: snippet.publishedAt || '',
       genre: 'Video musical',
-      youtubeVideoId: item.id,
+      youtubeVideoId: videoId,
       source: 'youtube',
     };
   }
@@ -695,6 +704,8 @@
 
   async function selectTrack(track, sourceElement = null) {
     state.lyricsController?.abort();
+    state.youtubeController?.abort();
+    state.youtubeController = null;
     state.lyricsController = new AbortController();
     const controller = state.lyricsController;
     stopLyricPlayback();
@@ -725,7 +736,7 @@
     });
     closeSearch();
     openPlayer(sourceElement);
-    if (!track.youtubeVideoId && youtubeApiKey) enrichCurrentTrackWithYouTube(track, controller);
+    if (!track.youtubeVideoId && youtubeApiKey) enrichCurrentTrackWithYouTube(track);
     els.lyricsLoading.hidden = false;
     $('.lyrics-loading p').textContent = 'Escuchando las palabras…';
     clearTimeout(state.lyricsMessageTimer);
@@ -906,10 +917,13 @@
     els.syncState.innerHTML = '<i></i> PULSO VISUAL';
   }
 
-  async function enrichCurrentTrackWithYouTube(track, controller) {
+  async function enrichCurrentTrackWithYouTube(track, isRetry = false) {
     if (state.currentTrack !== track) return;
     const lookupId = trackId(track);
     if (state.youtubeLookupPending && state.youtubeLookupTrackId === lookupId) return;
+    state.youtubeController?.abort();
+    const controller = new AbortController();
+    state.youtubeController = controller;
     const lookupToken = {};
     state.youtubeLookupPending = true;
     state.youtubeLookupTrackId = lookupId;
@@ -918,6 +932,7 @@
     const fallbackCopy = $('b', els.mediaFallback);
     if (fallbackCopy) fallbackCopy.textContent = 'Buscando reproducción disponible…';
     try {
+      if (isRetry) delete state.youtubeMatches[trackId(track)];
       const cached = state.youtubeMatches[trackId(track)];
       if (cached?.videoId) {
         Object.assign(track, {
@@ -926,13 +941,13 @@
           durationMs: track.durationMs || Number(cached.durationMs || 0),
           source: `${track.source || 'catalog'}+youtube`,
         });
-        if (state.currentTrack === track && state.lyricsController === controller) showYouTubeForTrack(track);
+        if (state.currentTrack === track) showYouTubeForTrack(track);
         return;
       }
       const candidates = await searchYouTube(`${track.title} ${track.artist} official audio`, controller.signal, true);
       const match = mergeSearchResults([], candidates, `${track.title} ${track.artist}`)[0];
       if (!match) throw new Error('No embeddable YouTube match');
-      if (state.currentTrack !== track || state.lyricsController !== controller) return;
+      if (state.currentTrack !== track) return;
       Object.assign(track, {
         youtubeVideoId: match.youtubeVideoId,
         youtubeTrackViewUrl: match.trackViewUrl,
@@ -945,7 +960,8 @@
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.warn('YouTube fallback unavailable', error);
-        setYouTubeControlState('error');
+        els.youtubeState.textContent = isRetry ? 'YOUTUBE · ABRIR BÚSQUEDA' : 'YOUTUBE · TOCA PARA REINTENTAR';
+        setYouTubeControlState(isRetry ? 'external' : 'error');
       }
     } finally {
       if (state.youtubeLookupToken === lookupToken) {
@@ -953,6 +969,7 @@
         state.youtubeLookupTrackId = '';
         state.youtubeLookupToken = null;
       }
+      if (state.youtubeController === controller) state.youtubeController = null;
       if (fallbackCopy) fallbackCopy.textContent = 'Sin fragmento en este catálogo';
     }
   }
@@ -1074,8 +1091,8 @@
         showToast('Buscando el video oficial…');
         return;
       }
-      if (state.currentTrack && state.lyricsController && youtubeApiKey) {
-        enrichCurrentTrackWithYouTube(state.currentTrack, state.lyricsController);
+      if (state.currentTrack && youtubeApiKey) {
+        enrichCurrentTrackWithYouTube(state.currentTrack, true);
         showToast('Reintentando la búsqueda del video…');
         return;
       }

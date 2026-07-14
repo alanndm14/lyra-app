@@ -8,10 +8,12 @@ Lyra convierte la búsqueda de una canción en una experiencia visual: la portad
 - Letras completas o sincronizadas mediante LRCLIB.
 - Portada de entrada a pantalla completa y centro de descubrimiento enfocado.
 - Charts globales y por país, generados cada día desde los rankings públicos de Apple Music.
+- Cada entrada del chart conserva el ID exacto del catálogo y se enriquece con su álbum, duración y fragmento; nunca se sustituye por una canción de nombre parecido.
 - Modos Cine, Flujo y Texto para cambiar la forma de leer.
 - Modo Cine por escenas: carga por capas, una línea a la vez, portada minimizada, pausa centrada y créditos finales.
 - Paleta extraída de la portada, fondo ambiental y animación cinética por palabra.
 - Pulso visual reactivo al fragmento de audio, con animación sintética cuando no hay audio disponible.
+- Estado ambiental sin karaoke ficticio cuando una edición no tiene letra, además de acceso a la búsqueda del video oficial cuando no existe fragmento.
 - Fragmentos de audio de 30 segundos con alineación manual: reproduce el fragmento y toca la línea que estás escuchando.
 - Favoritos, historial, control tipográfico y preferencia de movimiento guardados en el dispositivo.
 - Diseño adaptable, navegación por teclado y shell instalable con soporte sin conexión.

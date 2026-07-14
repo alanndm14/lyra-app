@@ -24,6 +24,7 @@
     previewOffset: null,
     previewOffsets: readStore('lyra:preview-offsets', {}),
     youtubePlayer: null,
+    youtubeReady: false,
     youtubeSyncFrame: null,
     youtubeMatches: readStore('lyra:youtube-matches', {}),
     youtubeLookupPending: false,
@@ -237,6 +238,9 @@
     els.lyricScrubber.addEventListener('input', () => {
       const value = Number(els.lyricScrubber.value);
       state.lyricTime = state.lyricDuration * value / 100;
+      if (state.youtubeReady && state.youtubePlayer?.seekTo && state.currentTrack?.youtubeVideoId) {
+        state.youtubePlayer.seekTo(state.lyricTime, true);
+      }
       if (!els.audio.paused) state.syncAnchor = state.lyricTime - els.audio.currentTime;
       updateLyricUI(true);
     });
@@ -282,7 +286,10 @@
     });
 
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopLyricPlayback();
+      if (!document.hidden) return;
+      try { state.youtubePlayer?.pauseVideo?.(); } catch { /* embedded player may still be preparing */ }
+      if (!els.audio.paused) els.audio.pause();
+      stopLyricPlayback();
     });
   }
 
@@ -480,6 +487,7 @@
     els.audio.pause();
     stopYouTubeSync();
     destroyYouTubePlayer();
+    state.youtubeReady = false;
     state.audioSync = false;
     els.previewPlayer.classList.remove('playing');
     setTheme(themes[state.themeIndex] || themes[0]);
@@ -906,7 +914,10 @@
     setYouTubeControlState(hasYouTube ? 'ready' : youtubeApiKey ? 'searching' : 'external');
     els.youtubePlayerShell.hidden = !hasYouTube;
     els.mediaFallback.hidden = hasPreview || hasYouTube;
-    if (hasYouTube) mountYouTubePlayer(track.youtubeVideoId);
+    if (hasYouTube) {
+      renderYouTubeEmbed(track.youtubeVideoId, track.title, track.artist);
+      mountYouTubePlayer(track.youtubeVideoId);
+    }
     els.youtubeSearchLink.href = `https://www.youtube.com/results?${new URLSearchParams({ search_query: `${track.title} ${track.artist} official audio` })}`;
     els.previewFill.style.width = '0%';
     els.previewTime.textContent = '0:00';
@@ -984,14 +995,31 @@
     const external = $('#externalLink');
     external.href = track.youtubeTrackViewUrl || `https://www.youtube.com/watch?v=${encodeURIComponent(track.youtubeVideoId)}`;
     external.hidden = false;
+    renderYouTubeEmbed(track.youtubeVideoId, track.title, track.artist);
     mountYouTubePlayer(track.youtubeVideoId);
+  }
+
+  function renderYouTubeEmbed(videoId, title = 'Video musical', artist = '') {
+    const current = $('#youtubePlayer');
+    if (!current || current.tagName === 'IFRAME') return;
+    const params = new URLSearchParams({
+      enablejsapi: '1', playsinline: '1', controls: '1', rel: '0', modestbranding: '1', origin: location.origin,
+    });
+    const iframe = document.createElement('iframe');
+    iframe.id = 'youtubePlayer';
+    iframe.src = `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params}`;
+    iframe.title = `${title} · ${artist}`.replace(/\s·\s$/, '');
+    iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    current.replaceWith(iframe);
   }
 
   function setYouTubeControlState(controlState) {
     const labels = {
       searching: 'BUSCANDO VIDEO',
-      ready: 'VIDEO',
-      playing: 'VIDEO',
+      ready: 'VIDEO + LETRA',
+      playing: 'VIDEO + LETRA',
       error: 'REINTENTAR VIDEO',
       external: 'ABRIR YOUTUBE',
     };
@@ -1031,17 +1059,21 @@
       const YT = await ensureYouTubeApi();
       if (state.currentTrack?.youtubeVideoId !== videoId || !els.youtubePlayerShell.isConnected) return;
       state.youtubePlayer = new YT.Player('youtubePlayer', {
-        videoId,
         width: '100%',
         height: '100%',
         playerVars: { playsinline: 1, rel: 0, modestbranding: 1, origin: location.origin },
         events: {
           onReady: () => {
+            state.youtubeReady = true;
+            if (state.lyricTime > .15) state.youtubePlayer?.seekTo?.(state.lyricTime, true);
             els.youtubeState.textContent = 'YOUTUBE · LISTO';
             setYouTubeControlState('ready');
+            setUnifiedPlaybackState(false, 'Reproducir video y letra');
           },
           onStateChange: onYouTubeStateChange,
           onError: () => {
+            state.youtubeReady = false;
+            setUnifiedPlaybackState(false, 'Abrir video en YouTube');
             els.youtubeState.textContent = 'YOUTUBE · VIDEO BLOQUEADO O NO DISPONIBLE';
             setYouTubeControlState('external');
           },
@@ -1049,6 +1081,8 @@
       });
     } catch (error) {
       console.error(error);
+      state.youtubeReady = false;
+      setUnifiedPlaybackState(false, 'Abrir video en YouTube');
       els.youtubeState.textContent = 'YOUTUBE · ABRIR EN YOUTUBE';
       setYouTubeControlState('external');
     }
@@ -1061,6 +1095,7 @@
     if (playing) {
       if (!els.audio.paused) els.audio.pause();
       stopLyricPlayback(false);
+      setUnifiedPlaybackState(true, 'Pausar video y letra');
       setYouTubeControlState('playing');
       els.youtubeState.textContent = 'YOUTUBE · SINCRONIZANDO';
       els.playerOverlay.classList.remove('paused');
@@ -1068,11 +1103,13 @@
       startYouTubeSync();
     } else if (paused) {
       stopYouTubeSync();
+      setUnifiedPlaybackState(false, 'Reproducir video y letra');
       setYouTubeControlState('ready');
       els.youtubeState.textContent = 'YOUTUBE · PAUSA';
       if (!state.cinemaEnded && !state.lyricPlaying) els.playerOverlay.classList.add('paused');
     } else if (ended) {
       stopYouTubeSync();
+      setUnifiedPlaybackState(false, 'Reproducir video y letra');
       setYouTubeControlState('ready');
       if (state.hasLyrics) finishCinema();
       else els.youtubeState.textContent = 'YOUTUBE · TERMINÓ';
@@ -1108,6 +1145,12 @@
     }
   }
 
+  function setUnifiedPlaybackState(playing, label) {
+    els.lyricTimeline.classList.toggle('playing', playing);
+    els.lyricPlay.setAttribute('aria-label', label);
+    els.lyricPlay.title = label;
+  }
+
   function startYouTubeSync() {
     stopYouTubeSync();
     const tick = () => {
@@ -1141,11 +1184,13 @@
     stopYouTubeSync();
     try { state.youtubePlayer?.destroy?.(); } catch { /* player may still be initializing */ }
     state.youtubePlayer = null;
+    state.youtubeReady = false;
     const host = $('#youtubePlayer');
-    if (!host) {
+    if (!host || host.tagName === 'IFRAME') {
       const replacement = document.createElement('div');
       replacement.id = 'youtubePlayer';
-      els.youtubePlayerShell?.prepend(replacement);
+      if (host) host.replaceWith(replacement);
+      else els.youtubePlayerShell?.prepend(replacement);
     }
   }
 
@@ -1195,7 +1240,7 @@
     const nodes = state.lyricElements.map(line => $('.lyric-translation', line));
     if (!language || !state.lyrics.length) {
       nodes.forEach(node => { if (node) { node.hidden = true; node.textContent = ''; } });
-      els.translationLanguage.disabled = false;
+      setTranslationState('TRADUCIR', false);
       return;
     }
 
@@ -1203,8 +1248,7 @@
     state.translationController = controller;
     const cacheKey = `${trackId(state.currentTrack)}|${language}`;
     let translations = state.translationCache[cacheKey];
-    els.translationLanguage.disabled = true;
-    els.translationLanguage.parentElement.classList.add('translating');
+    setTranslationState('TRADUCIENDO', true);
     try {
       if (!Array.isArray(translations) || translations.length !== state.lyrics.length) {
         translations = await translateLines(state.lyrics.map(line => line.text), language, controller.signal);
@@ -1221,17 +1265,28 @@
         node.textContent = translation ? `(${translation})` : '';
         node.hidden = !translation;
       });
+      setTranslationState('TRADUCIDA', false);
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.error(error);
+        setTranslationState('REINTENTAR', false);
         showToast('La traducción no respondió. La letra original sigue disponible.');
       }
     } finally {
       if (state.translationController === controller) {
-        els.translationLanguage.disabled = false;
         els.translationLanguage.parentElement.classList.remove('translating');
+        els.translationLanguage.parentElement.removeAttribute('aria-busy');
       }
     }
+  }
+
+  function setTranslationState(label, busy) {
+    const control = els.translationLanguage.parentElement;
+    const status = $('span', control);
+    if (status) status.textContent = label;
+    control.classList.toggle('translating', busy);
+    control.setAttribute('aria-busy', String(busy));
+    els.translationLanguage.disabled = false;
   }
 
   async function translateLines(lines, language, signal) {
@@ -1240,7 +1295,7 @@
     let current = [];
     let length = 0;
     lines.forEach((text, index) => {
-      const addition = String(text || '').length + (current.length ? 1 : 0);
+      const addition = String(text || '').length + (current.length ? 22 : 0);
       if (current.length && length + addition > 420) {
         batches.push(current);
         current = [];
@@ -1252,14 +1307,18 @@
     if (current.length) batches.push(current);
 
     for (const batch of batches) {
-      const joined = batch.map(item => item.text).join('\n');
+      const marker = '[[[LYRA_BREAK]]]';
+      const joined = batch.map(item => item.text).join(`\n${marker}\n`);
       const translated = await requestTranslation(joined, language, signal);
-      const parts = String(translated).split(/\r?\n/);
+      const normalized = String(translated).replace(/<br\s*\/?\s*>/gi, '\n');
+      let parts = normalized.split(new RegExp(`\\s*\\[\\[\\[LYRA_BREAK\\]\\]\\]\\s*`, 'i'));
+      if (parts.length !== batch.length) parts = normalized.split(/\r?\n/).filter(Boolean);
       if (parts.length === batch.length) {
         batch.forEach((item, index) => { translations[item.index] = parts[index].trim(); });
       } else {
-        const individual = await Promise.all(batch.map(item => requestTranslation(item.text, language, signal)));
-        batch.forEach((item, index) => { translations[item.index] = String(individual[index]).trim(); });
+        for (const item of batch) {
+          translations[item.index] = String(await requestTranslation(item.text, language, signal)).trim();
+        }
       }
     }
     return translations;
@@ -1348,6 +1407,20 @@
 
   function toggleLyricPlayback() {
     if (state.cinemaEnded) return replayExperience();
+    if (state.currentTrack?.youtubeVideoId) {
+      if (!state.youtubeReady || !state.youtubePlayer?.getPlayerState) {
+        const videoState = els.youtubeToggle.dataset.state;
+        if (videoState === 'external' || videoState === 'error') toggleYouTubeVideo();
+        else showToast('El video se está preparando dentro de Lyra…');
+        return;
+      }
+      toggleYouTubeVideo();
+      return;
+    }
+    if (state.youtubeLookupPending) {
+      showToast('Buscando el video para sincronizarlo con la letra…');
+      return;
+    }
     if (!state.hasLyrics) {
       if (state.currentTrack?.previewUrl) togglePreview();
       else showToast('Esta edición no tiene letra ni fragmento disponible.');
@@ -1369,6 +1442,7 @@
     els.endCredits.setAttribute('aria-hidden', 'true');
     els.syncState.innerHTML = '<i></i> PULSO VISUAL';
     els.lyricTimeline.classList.add('playing');
+    els.lyricPlay.setAttribute('aria-label', 'Pausar animación de letra');
     let previous = performance.now();
     const tick = now => {
       if (!state.lyricPlaying) return;
@@ -1383,6 +1457,7 @@
   function stopLyricPlayback(presentPause = true) {
     state.lyricPlaying = false;
     els.lyricTimeline.classList.remove('playing');
+    els.lyricPlay.setAttribute('aria-label', 'Reproducir animación de letra');
     if (state.lyricTimer) cancelAnimationFrame(state.lyricTimer);
     state.lyricTimer = null;
     if (presentPause && els.playerOverlay.classList.contains('open') && !state.cinemaEnded) {
@@ -1411,7 +1486,14 @@
     els.endCredits.setAttribute('aria-hidden', 'true');
     applyTrackTheme(state.currentTrack);
     updateLyricUI(true);
-    setTimeout(startLyricPlayback, state.motion ? 420 : 0);
+    setTimeout(() => {
+      if (state.youtubeReady && state.youtubePlayer?.seekTo) {
+        state.youtubePlayer.seekTo(0, true);
+        state.youtubePlayer.playVideo?.();
+      } else {
+        startLyricPlayback();
+      }
+    }, state.motion ? 420 : 0);
   }
 
   function updateBeatVisual(time) {

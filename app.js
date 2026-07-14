@@ -100,6 +100,7 @@
     youtubeSearchLink: $('#youtubeSearchLink'),
     youtubePlayerShell: $('#youtubePlayerShell'),
     youtubeState: $('#youtubeState'),
+    youtubeToggle: $('#youtubeToggle'),
     translationLanguage: $('#translationLanguage'),
   };
 
@@ -204,6 +205,7 @@
 
     $('#previewPlay').addEventListener('click', togglePreview);
     els.previewTimelinePlay.addEventListener('click', togglePreview);
+    els.youtubeToggle.addEventListener('click', toggleYouTubeVideo);
     els.audio.addEventListener('timeupdate', updatePreviewProgress);
     els.audio.addEventListener('loadedmetadata', updatePreviewProgress);
     els.audio.addEventListener('play', beginAudioSync);
@@ -681,7 +683,7 @@
     });
     closeSearch();
     openPlayer(sourceElement);
-    if (!track.previewUrl && !track.youtubeVideoId && youtubeApiKey) enrichCurrentTrackWithYouTube(track, controller);
+    if (!track.youtubeVideoId && youtubeApiKey) enrichCurrentTrackWithYouTube(track, controller);
     els.lyricsLoading.hidden = false;
     $('.lyrics-loading p').textContent = 'Escuchando las palabras…';
     clearTimeout(state.lyricsMessageTimer);
@@ -845,8 +847,10 @@
     const hasPreview = Boolean(track.previewUrl);
     const hasYouTube = Boolean(track.youtubeVideoId);
     els.playerOverlay.classList.toggle('has-youtube', hasYouTube);
-    $('#previewPlayer').style.display = hasPreview && !hasYouTube ? 'flex' : 'none';
-    els.previewTimelinePlay.hidden = !hasPreview || hasYouTube;
+    $('#previewPlayer').style.display = hasPreview ? 'flex' : 'none';
+    els.previewTimelinePlay.hidden = !hasPreview;
+    els.youtubeToggle.hidden = !hasYouTube;
+    els.youtubeToggle.classList.remove('playing');
     els.youtubePlayerShell.hidden = !hasYouTube;
     els.mediaFallback.hidden = hasPreview || hasYouTube;
     if (hasYouTube) mountYouTubePlayer(track.youtubeVideoId);
@@ -872,7 +876,7 @@
           durationMs: track.durationMs || Number(cached.durationMs || 0),
           source: `${track.source || 'catalog'}+youtube`,
         });
-        if (state.currentTrack === track && state.lyricsController === controller) renderTrackMeta(track);
+        if (state.currentTrack === track && state.lyricsController === controller) showYouTubeForTrack(track);
         return;
       }
       const candidates = await searchYouTube(`${track.title} ${track.artist} official audio`, controller.signal, true);
@@ -886,12 +890,25 @@
       });
       state.youtubeMatches[trackId(track)] = { videoId: match.youtubeVideoId, durationMs: match.durationMs || 0 };
       writeStore('lyra:youtube-matches', state.youtubeMatches);
-      renderTrackMeta(track);
+      showYouTubeForTrack(track);
     } catch (error) {
       if (error.name !== 'AbortError') console.warn('YouTube fallback unavailable', error);
     } finally {
       if (fallbackCopy) fallbackCopy.textContent = 'Sin fragmento en este catálogo';
     }
+  }
+
+  function showYouTubeForTrack(track) {
+    if (state.currentTrack !== track || !track.youtubeVideoId) return;
+    destroyYouTubePlayer();
+    els.playerOverlay.classList.add('has-youtube');
+    els.youtubePlayerShell.hidden = false;
+    els.youtubeToggle.hidden = false;
+    els.mediaFallback.hidden = true;
+    const external = $('#externalLink');
+    external.href = track.youtubeTrackViewUrl || `https://www.youtube.com/watch?v=${encodeURIComponent(track.youtubeVideoId)}`;
+    external.hidden = false;
+    mountYouTubePlayer(track.youtubeVideoId);
   }
 
   let youtubeApiPromise = null;
@@ -942,19 +959,38 @@
     const paused = event.data === window.YT?.PlayerState?.PAUSED;
     const ended = event.data === window.YT?.PlayerState?.ENDED;
     if (playing) {
+      if (!els.audio.paused) els.audio.pause();
       stopLyricPlayback(false);
+      els.youtubeToggle.classList.add('playing');
       els.youtubeState.textContent = 'YOUTUBE · SINCRONIZANDO';
       els.playerOverlay.classList.remove('paused');
       els.playerOverlay.classList.add('playing');
       startYouTubeSync();
     } else if (paused) {
       stopYouTubeSync();
+      els.youtubeToggle.classList.remove('playing');
       els.youtubeState.textContent = 'YOUTUBE · PAUSA';
-      if (!state.cinemaEnded) els.playerOverlay.classList.add('paused');
+      if (!state.cinemaEnded && !state.lyricPlaying) els.playerOverlay.classList.add('paused');
     } else if (ended) {
       stopYouTubeSync();
+      els.youtubeToggle.classList.remove('playing');
       if (state.hasLyrics) finishCinema();
       else els.youtubeState.textContent = 'YOUTUBE · TERMINÓ';
+    }
+  }
+
+  function toggleYouTubeVideo() {
+    const player = state.youtubePlayer;
+    if (!player?.getPlayerState) {
+      showToast('El video todavía se está preparando.');
+      return;
+    }
+    const playing = player.getPlayerState() === window.YT?.PlayerState?.PLAYING;
+    try {
+      if (playing) player.pauseVideo();
+      else player.playVideo();
+    } catch {
+      showToast('No fue posible controlar este video.');
     }
   }
 
@@ -1320,6 +1356,7 @@
   function togglePreview() {
     if (!state.currentTrack?.previewUrl) return;
     if (els.audio.paused) {
+      try { state.youtubePlayer?.pauseVideo?.(); } catch { /* player may still be preparing */ }
       stopLyricPlayback(false);
       state.audioSync = state.hasLyrics && state.previewOffset !== null;
       state.syncAnchor = state.previewOffset ?? 0;

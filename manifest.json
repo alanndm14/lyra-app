@@ -1,0 +1,11 @@
+{
+  "name": "Lyra — Lyrics feel alive",
+  "short_name": "Lyra",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07070c",
+  "theme_color": "#8e6cff",
+  "description": "Buscador visual de canciones y letras.",
+  "orientation": "any"
+}

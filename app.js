@@ -26,7 +26,9 @@
     lyricsMessageTimer: null,
     backgroundReady: false,
     lyricsReady: false,
+    hasLyrics: false,
     cinemaEnded: false,
+    beatFrame: null,
     returnToResults: false,
     motion: localStorage.getItem('lyra:motion') !== 'off',
     favorites: readStore('lyra:favorites', []),
@@ -84,6 +86,8 @@
     cinemaLoader: $('#cinemaLoader'),
     cinemaLoaderText: $('#cinemaLoaderText'),
     endCredits: $('#endCredits'),
+    mediaFallback: $('#mediaFallback'),
+    youtubeSearchLink: $('#youtubeSearchLink'),
   };
 
   init();
@@ -184,6 +188,7 @@
     els.audio.addEventListener('loadedmetadata', updatePreviewProgress);
     els.audio.addEventListener('play', beginAudioSync);
     els.audio.addEventListener('pause', () => {
+      stopBeatLoop();
       els.previewPlayer.classList.remove('playing');
       state.audioSync = false;
       if (!state.lyricPlaying && els.playerOverlay.classList.contains('open') && !state.cinemaEnded) {
@@ -286,7 +291,7 @@
   }
 
   function initBeatStage() {
-    els.beatStage.innerHTML = Array.from({ length: 36 }, (_, index) => `<i style="--i:${index};--beat:.12"></i>`).join('');
+    els.beatStage.innerHTML = Array.from({ length: 48 }, (_, index) => `<i style="--i:${index};--beat:.12"></i>`).join('');
   }
 
   function openEnvironment() {
@@ -347,33 +352,33 @@
     if (row.classList.contains('resolving')) return;
     row.classList.add('resolving');
     try {
-      const catalogCountry = state.chartCountry === 'global' ? 'us' : (state.chartCountry || 'mx');
-      const params = new URLSearchParams({ term: `${item.name} ${item.artistName}`, media: 'music', entity: 'song', limit: '10', country: catalogCountry.toUpperCase() });
-      const response = await fetch(`https://itunes.apple.com/search?${params}`);
-      if (!response.ok) throw new Error(`Catalog failed ${response.status}`);
-      const records = (await response.json()).results || [];
-      const wantedTitle = normalizeText(item.name);
-      const wantedArtist = normalizeText(item.artistName);
-      const best = records.sort((a, b) => {
-        const score = record => (normalizeText(record.trackName) === wantedTitle ? 8 : 0) + (normalizeText(record.artistName).includes(wantedArtist) ? 6 : 0);
-        return score(b) - score(a);
-      })[0];
-      const track = best ? normalizeAppleTrack(best) : {
+      const catalogCountry = item.catalogCountry || (state.chartCountry === 'global' ? 'us' : state.chartCountry) || 'mx';
+      let exact = null;
+      if (!item.catalogResolved) {
+        const params = new URLSearchParams({ id: String(item.id), country: catalogCountry.toUpperCase(), entity: 'song' });
+        const response = await fetchWithDeadline(`https://itunes.apple.com/lookup?${params}`, {}, 7000);
+        if (response.ok) {
+          const records = (await response.json()).results || [];
+          exact = records.find(record => String(record.trackId) === String(item.id) && record.kind === 'song') || null;
+        }
+      }
+      const track = exact ? normalizeAppleTrack(exact) : {
         id: item.id,
         title: item.name,
         artist: item.artistName,
-        album: item.name,
+        album: item.album || '',
         artworkUrl: item.artworkUrl100,
-        trackViewUrl: item.url,
-        genre: item.genres?.[0]?.name || '',
+        trackViewUrl: item.trackViewUrl || item.url,
+        genre: item.genre || item.genres?.[0]?.name || '',
         releaseDate: item.releaseDate || '',
-        previewUrl: '', durationMs: 0,
+        previewUrl: item.previewUrl || '',
+        durationMs: Number(item.durationMs || 0),
       };
-      row.classList.remove('resolving');
       selectTrack(track, row);
     } catch (error) {
       console.error(error);
-      showToast('No pude abrir esta entrada del chart.');
+      showToast('No pude consultar esta entrada exacta del chart.');
+    } finally {
       row.classList.remove('resolving');
     }
   }
@@ -392,7 +397,7 @@
   }
 
   function openPlayer(sourceElement = null) {
-    els.playerOverlay.classList.remove('closing', 'playing', 'paused', 'ended', 'background-ready', 'lyrics-ready');
+    els.playerOverlay.classList.remove('closing', 'playing', 'paused', 'ended', 'background-ready', 'lyrics-ready', 'no-lyrics');
     els.playerOverlay.classList.add('phase-loading');
     els.playerOverlay.classList.toggle('cinema-active', state.lyricMode === 'cinematic');
     els.endCredits.setAttribute('aria-hidden', 'true');
@@ -486,7 +491,7 @@
     const attribute = state.filter === 'artist' ? 'artistTerm' : state.filter === 'album' ? 'albumTerm' : state.filter === 'song' ? 'songTerm' : '';
     const params = new URLSearchParams({ term: query, media: 'music', entity: 'song', limit: '24', country: 'MX' });
     if (attribute) params.set('attribute', attribute);
-    const response = await fetch(`https://itunes.apple.com/search?${params}`, { signal });
+    const response = await fetchWithDeadline(`https://itunes.apple.com/search?${params}`, { signal }, 8000);
     if (!response.ok) throw new Error(`Apple catalog failed ${response.status}`);
     const data = await response.json();
     return (data.results || []).map(normalizeAppleTrack);
@@ -535,6 +540,7 @@
     state.returnToResults = els.searchOverlay.classList.contains('open');
     state.backgroundReady = false;
     state.lyricsReady = false;
+    state.hasLyrics = false;
     state.cinemaEnded = false;
     updateFavoriteButton();
     renderTrackMeta(track);
@@ -608,21 +614,32 @@
     els.lyricsLoading.hidden = true;
     if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
       $('#lyricsBadge').innerHTML = '<i style="background:#ff786e;box-shadow:0 0 10px #ff786e"></i> SIN LETRA DISPONIBLE';
+      state.hasLyrics = false;
       state.plainLyrics = '';
-      state.lyrics = [
-        { time: 0, text: 'Esta letra todavía no está disponible.' },
-        { time: 4, text: 'Prueba otra versión de la canción' },
-        { time: 8, text: 'o vuelve a buscarla por artista y álbum.' },
-      ];
-      state.lyricDuration = 13;
+      state.lyrics = [];
+      state.lyricElements = [];
+      state.lyricDuration = Number(state.currentTrack?.durationMs || 0) / 1000;
+      state.lyricTime = 0;
+      els.lyricsContent.innerHTML = '';
+      els.lyricEcho.innerHTML = '';
+      els.playerOverlay.classList.add('no-lyrics');
+      els.lyricPlay.disabled = true;
+      els.lyricScrubber.disabled = true;
+      $('#copyLyricsBtn').disabled = true;
+      els.lyricTime.textContent = '0:00';
+      els.lyricTotal.textContent = state.lyricDuration ? `/ ${formatTime(state.lyricDuration)}` : '/ —:—';
       $('#lyricsKicker').textContent = 'SIN LETRA · MODO AMBIENTE';
-      $('#lyricsHeading').textContent = 'La portada todavía puede contar una historia.';
-      renderLyrics();
+      $('#lyricsHeading').textContent = 'La portada y el pulso toman la escena.';
       state.lyricsReady = true;
       revealCinemaWhenReady();
       return;
     }
 
+    state.hasLyrics = true;
+    els.playerOverlay.classList.remove('no-lyrics');
+    els.lyricPlay.disabled = false;
+    els.lyricScrubber.disabled = false;
+    $('#copyLyricsBtn').disabled = false;
     $('#lyricsBadge').innerHTML = `<i></i> ${data.syncedLyrics ? 'LETRA SINCRONIZADA' : 'LETRA COMPLETA'}`;
     $('#lyricsKicker').textContent = data.syncedLyrics ? 'TIEMPOS LRC · ESCENA CINÉTICA' : 'LETRA COMPLETA · RITMO ESTIMADO';
     $('#lyricsHeading').textContent = data.syncedLyrics ? 'Cada línea entra exactamente a tiempo.' : 'Lyra convierte el texto en un pulso visual.';
@@ -658,19 +675,19 @@
         album_name: track.album,
         duration: String(duration),
       });
-      const cached = await fetch(`https://lrclib.net/api/get-cached?${exact}`, {
+      const cached = await fetchWithDeadline(`https://lrclib.net/api/get-cached?${exact}`, {
         signal,
         headers: { Accept: 'application/json' },
-      });
+      }, 7500);
       if (cached.ok) return cached.json();
       if (cached.status !== 404) throw new Error(`Lyrics cache failed ${cached.status}`);
     }
     const params = new URLSearchParams({ track_name: track.title, artist_name: track.artist });
     if (track.album) params.set('album_name', track.album);
-    const response = await fetch(`https://lrclib.net/api/search?${params}`, {
+    const response = await fetchWithDeadline(`https://lrclib.net/api/search?${params}`, {
       signal,
       headers: { Accept: 'application/json' },
-    });
+    }, 7500);
     if (!response.ok) throw new Error(`Lyrics provider failed ${response.status}`);
     return pickBestLyrics(await response.json(), track);
   }
@@ -694,7 +711,10 @@
     els.audio.removeAttribute('src');
     if (track.previewUrl) els.audio.src = track.previewUrl;
     els.audio.load();
-    $('#previewPlayer').style.display = track.previewUrl ? 'flex' : 'none';
+    const hasPreview = Boolean(track.previewUrl);
+    $('#previewPlayer').style.display = hasPreview ? 'flex' : 'none';
+    els.mediaFallback.hidden = hasPreview;
+    els.youtubeSearchLink.href = `https://www.youtube.com/results?${new URLSearchParams({ search_query: `${track.title} ${track.artist} official audio` })}`;
     els.previewFill.style.width = '0%';
     els.previewTime.textContent = '0:00';
     els.previewDuration.textContent = '0:30';
@@ -811,6 +831,11 @@
 
   function toggleLyricPlayback() {
     if (state.cinemaEnded) return replayExperience();
+    if (!state.hasLyrics) {
+      if (state.currentTrack?.previewUrl) togglePreview();
+      else showToast('Esta edición no tiene letra ni fragmento disponible.');
+      return;
+    }
     state.lyricPlaying ? stopLyricPlayback(true) : startLyricPlayback();
   }
 
@@ -875,13 +900,29 @@
     if (!els.beatStage || (!state.lyricPlaying && els.audio.paused)) return;
     if (state.audioAnalyser && state.audioData && !els.audio.paused) state.audioAnalyser.getByteFrequencyData(state.audioData);
     const audioEnergy = els.audio.paused ? 0 : .18 + Math.abs(Math.sin(els.audio.currentTime * 5.6)) * .58;
-    $$('#beatStage i').forEach((bar, index) => {
+    const bars = $$('#beatStage i');
+    bars.forEach((bar, index) => {
       const wave = Math.abs(Math.sin(time * (2.1 + index % 5 * .13) + index * .72));
       const kick = Math.pow(Math.max(0, Math.sin(time * 3.25 - index * .08)), 6);
-      const liveBin = state.audioData?.length ? state.audioData[Math.floor(index / 36 * state.audioData.length)] / 255 : 0;
+      const liveBin = state.audioData?.length ? state.audioData[Math.min(state.audioData.length - 1, Math.floor(index / bars.length * state.audioData.length))] / 255 : 0;
       const energy = Math.min(1, .08 + wave * .24 + kick * .62 + audioEnergy * .2 + liveBin * .72);
       bar.style.setProperty('--beat', energy.toFixed(3));
     });
+  }
+
+  function startBeatLoop() {
+    stopBeatLoop();
+    const tick = () => {
+      if (els.audio.paused) return;
+      updateBeatVisual(els.audio.currentTime);
+      state.beatFrame = requestAnimationFrame(tick);
+    };
+    state.beatFrame = requestAnimationFrame(tick);
+  }
+
+  function stopBeatLoop() {
+    if (state.beatFrame) cancelAnimationFrame(state.beatFrame);
+    state.beatFrame = null;
   }
 
   async function ensureAudioAnalyser() {
@@ -933,15 +974,17 @@
 
   function beginAudioSync() {
     ensureAudioAnalyser();
-    state.audioSync = true;
+    state.audioSync = state.hasLyrics;
+    startBeatLoop();
     els.playerOverlay.classList.remove('paused');
     els.playerOverlay.classList.add('playing');
-    state.syncAnchor = state.lyricTime - els.audio.currentTime;
+    if (state.hasLyrics) state.syncAnchor = state.lyricTime - els.audio.currentTime;
     els.previewPlayer.classList.add('playing');
     els.syncState.innerHTML = '<i></i> FRAGMENTO EN VIVO';
   }
 
   function endAudioSync() {
+    stopBeatLoop();
     state.audioSync = false;
     els.previewPlayer.classList.remove('playing');
     if (!state.lyricPlaying && !state.cinemaEnded) {
@@ -1276,23 +1319,61 @@
 
   function pickBestLyrics(records, track) {
     if (!Array.isArray(records) || !records.length) return null;
-    const normalize = s => String(s || '').toLowerCase().replace(/[^a-z0-9áéíóúüñ]+/gi, ' ').trim();
-    const wantedTitle = normalize(track.title);
-    const wantedArtist = normalize(track.artist);
-    return records.sort((a, b) => {
+    const wantedTitle = normalizeText(track.title);
+    const wantedArtist = normalizeText(track.artist);
+    const wantedDuration = Number(track.durationMs || 0) / 1000;
+    const candidates = records.filter(record => {
+      if (normalizeText(record.trackName) !== wantedTitle) return false;
+      if (!artistsMatch(wantedArtist, normalizeText(record.artistName))) return false;
+      if (wantedDuration && record.duration && Math.abs(Number(record.duration) - wantedDuration) > 18) return false;
+      return Boolean(record.syncedLyrics || record.plainLyrics);
+    });
+    if (!candidates.length) return null;
+    return candidates.sort((a, b) => {
       const score = record => {
         let value = 0;
-        if (normalize(record.trackName) === wantedTitle) value += 5;
-        if (normalize(record.artistName).includes(wantedArtist) || wantedArtist.includes(normalize(record.artistName))) value += 4;
         if (record.syncedLyrics) value += 2;
         if (record.plainLyrics) value += 1;
+        if (normalizeText(record.albumName) === normalizeText(track.album)) value += 3;
+        if (wantedDuration && record.duration) value += Math.max(0, 3 - Math.abs(Number(record.duration) - wantedDuration) / 6);
         return value;
       };
       return score(b) - score(a);
     })[0];
   }
 
+  function artistsMatch(left, right) {
+    if (!left || !right) return false;
+    if (left === right || left.includes(right) || right.includes(left)) return true;
+    const ignored = new Set(['and', 'the', 'feat', 'featuring', 'with']);
+    const leftWords = new Set(left.split(' ').filter(word => word.length > 2 && !ignored.has(word)));
+    const rightWords = new Set(right.split(' ').filter(word => word.length > 2 && !ignored.has(word)));
+    const shared = [...leftWords].filter(word => rightWords.has(word)).length;
+    return shared >= Math.max(1, Math.ceil(Math.min(leftWords.size, rightWords.size) * .6));
+  }
+
   function trackId(track) { return String(track.id || `${track.artist}|${track.title}|${track.album}`).toLowerCase(); }
+  async function fetchWithDeadline(url, options = {}, timeoutMs = 8000) {
+    const controller = new AbortController();
+    const externalSignal = options.signal;
+    let timedOut = false;
+    const relayAbort = () => controller.abort(externalSignal?.reason);
+    if (externalSignal?.aborted) relayAbort();
+    else externalSignal?.addEventListener('abort', relayAbort, { once: true });
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, timeoutMs);
+    try {
+      return await fetch(url, { ...options, signal: controller.signal });
+    } catch (error) {
+      if (timedOut) throw new Error(`Request timed out after ${timeoutMs}ms`);
+      throw error;
+    } finally {
+      clearTimeout(timer);
+      externalSignal?.removeEventListener('abort', relayAbort);
+    }
+  }
   function hasLocalApi() { return ['localhost', '127.0.0.1', '::1'].includes(location.hostname); }
   function upscaleArtwork(url, size = 700) { return String(url || '').replace(/\/\d+x\d+bb\./, `/${size}x${size}bb.`); }
   function stripLrc(value) { return String(value).replace(/\[[^\]]+\]/g, '').replace(/^\s+|\s+$/gm, '').trim(); }

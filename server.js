@@ -44,7 +44,7 @@ async function handleSearch(url, res) {
   const attributeMap = { song: 'songTerm', artist: 'artistTerm', album: 'albumTerm' };
   if (attributeMap[filter]) params.set('attribute', attributeMap[filter]);
 
-  const response = await fetch(`https://itunes.apple.com/search?${params}`, { headers: { 'User-Agent': UA } });
+  const response = await fetchExternal(`https://itunes.apple.com/search?${params}`, { headers: { 'User-Agent': UA } });
   if (!response.ok) return json(res, response.status, { error: 'Catalog provider unavailable' });
   const data = await response.json();
   const results = (data.results || []).map(item => ({
@@ -76,14 +76,14 @@ async function handleLyrics(url, res) {
       album_name: album,
       duration: String(Math.round(duration)),
     });
-    const cached = await fetch(`https://lrclib.net/api/get-cached?${exact}`, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+    const cached = await fetchExternal(`https://lrclib.net/api/get-cached?${exact}`, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
     if (cached.ok) return json(res, 200, await cached.json());
     if (cached.status !== 404) return json(res, cached.status, { error: 'Lyrics provider unavailable' });
   }
 
   const params = new URLSearchParams({ track_name: track, artist_name: artist });
   if (album) params.set('album_name', album);
-  const response = await fetch(`https://lrclib.net/api/search?${params}`, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+  const response = await fetchExternal(`https://lrclib.net/api/search?${params}`, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
   if (!response.ok) return json(res, response.status, { error: 'Lyrics provider unavailable' });
   const records = await response.json();
   const best = pickBest(records, { track, artist, album, duration });
@@ -97,24 +97,45 @@ function pickBest(records, wanted) {
   const wa = normalize(wanted.artist);
   const wal = normalize(wanted.album);
 
-  return records
+  const matches = records
+    .filter(record => {
+      if (normalize(record.trackName) !== wt) return false;
+      if (!artistsMatch(wa, normalize(record.artistName))) return false;
+      if (wanted.duration && record.duration && Math.abs(Number(record.duration) - wanted.duration) > 18) return false;
+      return Boolean(record.syncedLyrics || record.plainLyrics);
+    })
     .map(record => {
       let score = 0;
-      const rt = normalize(record.trackName);
-      const ra = normalize(record.artistName);
       const ral = normalize(record.albumName);
-      if (rt === wt) score += 9;
-      else if (rt.includes(wt) || wt.includes(rt)) score += 4;
-      if (ra === wa) score += 8;
-      else if (ra.includes(wa) || wa.includes(ra)) score += 4;
       if (wal && ral === wal) score += 5;
-      else if (wal && (ral.includes(wal) || wal.includes(ral))) score += 2;
       if (record.syncedLyrics) score += 3;
       if (record.plainLyrics) score += 1;
       if (wanted.duration && record.duration) score += Math.max(0, 3 - Math.abs(Number(record.duration) - wanted.duration) / 8);
       return { record, score };
     })
-    .sort((a, b) => b.score - a.score)[0].record;
+    .sort((a, b) => b.score - a.score);
+  return matches[0]?.record || null;
+}
+
+function artistsMatch(left, right) {
+  if (!left || !right) return false;
+  if (left === right || left.includes(right) || right.includes(left)) return true;
+  const ignored = new Set(['and', 'the', 'feat', 'featuring', 'with']);
+  const words = value => new Set(value.split(' ').filter(word => word.length > 2 && !ignored.has(word)));
+  const leftWords = words(left);
+  const rightWords = words(right);
+  const shared = [...leftWords].filter(word => rightWords.has(word)).length;
+  return shared >= Math.max(1, Math.ceil(Math.min(leftWords.size, rightWords.size) * .6));
+}
+
+async function fetchExternal(url, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function serveStatic(pathname, res) {

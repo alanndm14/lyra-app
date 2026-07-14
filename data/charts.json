@@ -1,6 +1,238 @@
 {
-  "updatedAt": "2026-07-14T03:46:58.498Z",
+  "updatedAt": "2026-07-14T03:52:45.984Z",
   "charts": {
+    "mx": [
+      {
+        "id": "1804142885",
+        "name": "TU SANCHO",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/tu-sancho/1804142476?i=1804142885",
+        "catalogCountry": "mx",
+        "releaseDate": "2025-05-02T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "111XPANTIA",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/5f/b8/925fb878-c5e9-c023-0f7c-533321155a99/mzaf_15050664707608556027.plus.aac.p.m4a",
+        "durationMs": 177995,
+        "trackViewUrl": "https://music.apple.com/mx/album/tu-sancho/1804142476?i=1804142885&uo=4",
+        "genre": "Música mexicana",
+        "catalogResolved": true
+      },
+      {
+        "id": "1712363845",
+        "name": "EXCESOS",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/21/e3/b7/21e3b74f-571b-07ce-567b-a2aa8274c7b2/196871548922.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/excesos/1712362875?i=1712363845",
+        "catalogCountry": "mx",
+        "releaseDate": "2023-10-20T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "Pa las Baby's Y Belikeada",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/07/a6/b2/07a6b253-d59c-c85a-959e-fbec24abc26a/mzaf_10700723874153716546.plus.aac.p.m4a",
+        "durationMs": 187077,
+        "trackViewUrl": "https://music.apple.com/mx/album/excesos/1712362875?i=1712363845&uo=4",
+        "genre": "Música mexicana",
+        "catalogResolved": true
+      },
+      {
+        "id": "1570323056",
+        "name": "Yonaguni",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b6/12/da/b612daba-6c68-c2ab-7492-fb2e079074d5/196006829308.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/yonaguni/1570323047?i=1570323056",
+        "catalogCountry": "mx",
+        "releaseDate": "2021-06-04T07:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "Yonaguni - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/49/b9/6b/49b96b1c-aeee-7e22-ce0a-be17bab4a864/mzaf_5470366028981689473.plus.aac.p.m4a",
+        "durationMs": 206710,
+        "trackViewUrl": "https://music.apple.com/mx/album/yonaguni/1570323047?i=1570323056&uo=4",
+        "genre": "Urbano latino",
+        "catalogResolved": true
+      },
+      {
+        "id": "1804142886",
+        "name": "Marlboro Rojo",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/marlboro-rojo/1804142476?i=1804142886",
+        "catalogCountry": "mx",
+        "releaseDate": "2025-05-02T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "111XPANTIA",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bb/fb/48/bbfb484d-ed94-c835-b110-2075a22600ce/mzaf_15514896600297468899.plus.aac.p.m4a",
+        "durationMs": 184174,
+        "trackViewUrl": "https://music.apple.com/mx/album/marlboro-rojo/1804142476?i=1804142886&uo=4",
+        "genre": "Música mexicana",
+        "catalogResolved": true
+      },
+      {
+        "id": "1783250950",
+        "name": "gervonta",
+        "artistName": "Peso Pluma",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/39/ed/a6/39eda6fa-33fc-76da-238e-454c5ad8b73c/199066114025.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/gervonta/1783250949?i=1783250950",
+        "catalogCountry": "mx",
+        "releaseDate": "2024-12-05T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "gervonta - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c9/1f/ae/c91faeb1-658b-b58d-38da-35443be2200a/mzaf_9274918364104921427.plus.aac.p.m4a",
+        "durationMs": 167368,
+        "trackViewUrl": "https://music.apple.com/mx/album/gervonta/1783250949?i=1783250950&uo=4",
+        "genre": "Música mexicana",
+        "catalogResolved": true
+      },
+      {
+        "id": "1804142884",
+        "name": "ANSIEDAD",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/ansiedad/1804142476?i=1804142884",
+        "catalogCountry": "mx",
+        "releaseDate": "2025-05-02T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "111XPANTIA",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/88/44/f9/8844f9c2-778d-7755-869e-271a28a0a5a9/mzaf_10738123349559660324.plus.aac.p.m4a",
+        "durationMs": 151836,
+        "trackViewUrl": "https://music.apple.com/mx/album/ansiedad/1804142476?i=1804142884&uo=4",
+        "genre": "Música mexicana",
+        "catalogResolved": true
+      },
+      {
+        "id": "1748016028",
+        "name": "HOLLYWOOD",
+        "artistName": "Peso Pluma & Estevan Plazola",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/e9/65/3de9651e-fe11-0525-7eee-762861af1152/198391808319.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/hollywood/1748015447?i=1748016028",
+        "catalogCountry": "mx",
+        "releaseDate": "2024-06-20T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "ÉXODO",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/1c/7c/3a1c7c4c-4ea5-8646-aaea-4f878e65b95f/mzaf_4099277357364898295.plus.aac.p.m4a",
+        "durationMs": 284864,
+        "trackViewUrl": "https://music.apple.com/mx/album/hollywood/1748015447?i=1748016028&uo=4",
+        "genre": "Música mexicana",
+        "catalogResolved": true
+      },
+      {
+        "id": "1887113850",
+        "name": "Nalguita y Teta",
+        "artistName": "Neton Vega",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3d/94/07/3d94072e-4694-fdc5-2b3d-2b81f2f95b64/1963624427341_cover.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/nalguita-y-teta/1887113849?i=1887113850",
+        "catalogCountry": "mx",
+        "releaseDate": "2026-03-27T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ],
+        "album": "Nalguita y Teta - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cf/62/0f/cf620f07-9a02-2bec-e58e-a6185cd82e29/mzaf_12902862987490796411.plus.aac.p.m4a",
+        "durationMs": 187765,
+        "trackViewUrl": "https://music.apple.com/mx/album/nalguita-y-teta/1887113849?i=1887113850&uo=4",
+        "genre": "Música latina",
+        "catalogResolved": true
+      },
+      {
+        "id": "1622045954",
+        "name": "Efecto",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3e/04/eb/3e04ebf6-370f-f59d-ec84-2c2643db92f1/196626945068.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/efecto/1622045624?i=1622045954",
+        "catalogCountry": "mx",
+        "releaseDate": "2022-05-06T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ],
+        "album": "Un Verano Sin Ti",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4e/ec/7b/4eec7bd9-982c-bb39-4acb-77d724502e8a/mzaf_9582878707075648609.plus.aac.p.m4a",
+        "durationMs": 213061,
+        "trackViewUrl": "https://music.apple.com/mx/album/efecto/1622045624?i=1622045954&uo=4",
+        "genre": "Música latina",
+        "catalogResolved": true
+      },
+      {
+        "id": "1861943162",
+        "name": "daño",
+        "artistName": "Peso Pluma & Tito Double P",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e3/47/a9/e347a9c6-1cf0-6154-3976-b9dd615e2a83/199806514993.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/da%C3%B1o/1861942827?i=1861943162",
+        "catalogCountry": "mx",
+        "releaseDate": "2025-12-25T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "DINASTÍA",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5f/a6/61/5fa661f1-6206-6c85-2db8-3c68838e65f0/mzaf_10189204612937272553.plus.aac.p.m4a",
+        "durationMs": 197008,
+        "trackViewUrl": "https://music.apple.com/mx/album/da%C3%B1o/1861942827?i=1861943162&uo=4",
+        "genre": "Música mexicana",
+        "catalogResolved": true
+      }
+    ],
     "us": [
       {
         "id": "1844932150",
@@ -465,238 +697,6 @@
         "catalogResolved": true
       }
     ],
-    "gb": [
-      {
-        "id": "1817609509",
-        "name": "Man I Need",
-        "artistName": "Olivia Dean",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/man-i-need/1817609404?i=1817609509",
-        "catalogCountry": "gb",
-        "releaseDate": "2025-09-26T12:00:00Z",
-        "genres": [
-          {
-            "name": "Pop"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "The Art of Loving",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/42/bb/5b/42bb5b21-2550-6205-bf3c-334b0e7d6199/mzaf_17462928687872215879.plus.aac.p.m4a",
-        "durationMs": 184000,
-        "trackViewUrl": "https://music.apple.com/gb/album/man-i-need/1817609404?i=1817609509&uo=4",
-        "genre": "Pop",
-        "catalogResolved": true
-      },
-      {
-        "id": "1820918468",
-        "name": "Rein Me In",
-        "artistName": "Sam Fender & Olivia Dean",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8f/0f/9f/8f0f9f3d-b26b-779d-d1f1-2db2154a68b7/25UMGIM75096.rgb.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/rein-me-in/1820918466?i=1820918468",
-        "catalogCountry": "gb",
-        "releaseDate": "2025-10-17T12:00:00Z",
-        "genres": [
-          {
-            "name": "Alternative"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "Rein Me In - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3c/4f/0d/3c4f0d98-9c3e-6c44-c796-e3ceb81a3f09/mzaf_3221627182838260274.plus.aac.p.m4a",
-        "durationMs": 339411,
-        "trackViewUrl": "https://music.apple.com/gb/album/rein-me-in/1820918466?i=1820918468&uo=4",
-        "genre": "Alternative",
-        "catalogResolved": true
-      },
-      {
-        "id": "1525933490",
-        "name": "Wonderwall (Remastered)",
-        "artistName": "Oasis",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/34/2e/cb/342ecb17-ef19-816a-4ce5-e60b9ceec161/5051961073164.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/wonderwall-remastered/1525933483?i=1525933490",
-        "catalogCountry": "gb",
-        "releaseDate": "1995-10-02T12:00:00Z",
-        "genres": [
-          {
-            "name": "Music"
-          },
-          {
-            "name": "Alternative"
-          }
-        ],
-        "album": "(What's The Story) Morning Glory? [Deluxe Remastered Edition]",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/ea/a8/c8/eaa8c8c2-3927-aa05-f2f2-8798104c0365/mzaf_2256330201720040258.plus.aac.p.m4a",
-        "durationMs": 258773,
-        "trackViewUrl": "https://music.apple.com/gb/album/wonderwall-remastered/1525933483?i=1525933490&uo=4",
-        "genre": "Indie Rock",
-        "catalogResolved": true
-      },
-      {
-        "id": "1870514330",
-        "name": "Talk To You (feat. 54 Ultra)",
-        "artistName": "ANOTR",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/6a/77/f9/6a77f93a-9286-60d8-3a0b-7d01a4b222cf/5665.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/talk-to-you-feat-54-ultra/1870514329?i=1870514330",
-        "catalogCountry": "gb",
-        "releaseDate": "2026-03-06T12:00:00Z",
-        "genres": [
-          {
-            "name": "Dance"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "Talk To You (feat. 54 Ultra) - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/aa/c0/52/aac05210-37d4-0d74-5013-48156d87d74c/mzaf_573344203389765709.plus.aac.p.m4a",
-        "durationMs": 191077,
-        "trackViewUrl": "https://music.apple.com/gb/album/talk-to-you-feat-54-ultra/1870514329?i=1870514330&uo=4",
-        "genre": "Dance",
-        "catalogResolved": true
-      },
-      {
-        "id": "6769070199",
-        "name": "Movin' To The Sun",
-        "artistName": "HUGEL, Imael Angel & Ultra Naté",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/96/61/7a/96617ab5-51da-7cfc-97e5-c5a6a893c210/1087654.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/movin-to-the-sun/6769069923?i=6769070199",
-        "catalogCountry": "gb",
-        "releaseDate": "2026-05-22T12:00:00Z",
-        "genres": [
-          {
-            "name": "Electronic"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "Movin' To The Sun - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a9/d2/09/a9d209b4-55a5-67e8-2e15-949cb00e716d/mzaf_11935934741751979581.plus.aac.p.m4a",
-        "durationMs": 142200,
-        "trackViewUrl": "https://music.apple.com/gb/album/movin-to-the-sun/6769069923?i=6769070199&uo=4",
-        "genre": "Electronic",
-        "catalogResolved": true
-      },
-      {
-        "id": "1844932150",
-        "name": "Choosin' Texas",
-        "artistName": "Ella Langley",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/91/4d/e2914d0a-7f1d-f04c-fbf4-c50b38548838/196873638690.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/choosin-texas/1844932149?i=1844932150",
-        "catalogCountry": "gb",
-        "releaseDate": "2025-10-17T12:00:00Z",
-        "genres": [
-          {
-            "name": "Country"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "Choosin' Texas - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/38/49/4c/38494cb4-f9e0-1db4-0b84-8c478cb55390/mzaf_4251933786704889664.plus.aac.p.m4a",
-        "durationMs": 232226,
-        "trackViewUrl": "https://music.apple.com/gb/album/choosin-texas/1844932149?i=1844932150&uo=4",
-        "genre": "Country",
-        "catalogResolved": true
-      },
-      {
-        "id": "1889992115",
-        "name": "stupid song",
-        "artistName": "Olivia Rodrigo",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/stupid-song/1889992111?i=1889992115",
-        "catalogCountry": "gb",
-        "releaseDate": "2026-06-12T07:00:00Z",
-        "genres": [
-          {
-            "name": "Pop"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "you seem pretty sad for a girl so in love",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/d6/78/abd678a1-bf4e-7ee9-d0b2-ba8afee10914/mzaf_3280183609788906841.plus.aac.p.m4a",
-        "durationMs": 209680,
-        "trackViewUrl": "https://music.apple.com/gb/album/stupid-song/1889992111?i=1889992115&uo=4",
-        "genre": "Pop",
-        "catalogResolved": true
-      },
-      {
-        "id": "1889992123",
-        "name": "the cure",
-        "artistName": "Olivia Rodrigo",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/the-cure/1889992111?i=1889992123",
-        "catalogCountry": "gb",
-        "releaseDate": "2026-05-22T07:00:00Z",
-        "genres": [
-          {
-            "name": "Pop"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "you seem pretty sad for a girl so in love",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a5/bc/1e/a5bc1e73-55d7-3835-4020-cb005f8a3b3d/mzaf_15167349291907334066.plus.aac.p.m4a",
-        "durationMs": 297090,
-        "trackViewUrl": "https://music.apple.com/gb/album/the-cure/1889992111?i=1889992123&uo=4",
-        "genre": "Pop",
-        "catalogResolved": true
-      },
-      {
-        "id": "1884097804",
-        "name": "Free Your Mind",
-        "artistName": "Prospa & Cloonee",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/15/eb/a6/15eba69b-6089-53a7-3106-5c7dfac97677/820200577436.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/free-your-mind/1884097801?i=1884097804",
-        "catalogCountry": "gb",
-        "releaseDate": "2026-03-27T12:00:00Z",
-        "genres": [
-          {
-            "name": "Dance"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "Free Your Mind - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ef/eb/29/efeb2948-724e-95e3-4611-fcf47d933b15/mzaf_12439285597506860703.plus.aac.p.m4a",
-        "durationMs": 201700,
-        "trackViewUrl": "https://music.apple.com/gb/album/free-your-mind/1884097801?i=1884097804&uo=4",
-        "genre": "Dance",
-        "catalogResolved": true
-      },
-      {
-        "id": "6769568596",
-        "name": "Janice STFU",
-        "artistName": "Drake",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/35/b9/06/35b90629-a873-14f8-4789-ffc324960038/26UMGIM63614.rgb.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/gb/album/janice-stfu/6769568449?i=6769568596",
-        "catalogCountry": "gb",
-        "releaseDate": "2026-05-15T12:00:00Z",
-        "genres": [
-          {
-            "name": "Hip-Hop/Rap"
-          },
-          {
-            "name": "Music"
-          }
-        ],
-        "album": "ICEMAN",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a2/a3/18/a2a31893-76db-627e-0985-6c720be140b4/mzaf_4732841734320991384.plus.aac.p.m4a",
-        "durationMs": 237344,
-        "trackViewUrl": "https://music.apple.com/gb/album/janice-stfu/6769568449?i=6769568596&uo=4",
-        "genre": "Hip-Hop/Rap",
-        "catalogResolved": true
-      }
-    ],
     "ar": [
       {
         "id": "895127012",
@@ -929,60 +929,14 @@
         "catalogResolved": true
       }
     ],
-    "mx": [
-      {
-        "id": "1804142885",
-        "name": "TU SANCHO",
-        "artistName": "Fuerza Regida",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/tu-sancho/1804142476?i=1804142885",
-        "catalogCountry": "mx",
-        "releaseDate": "2025-05-02T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "111XPANTIA",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/5f/b8/925fb878-c5e9-c023-0f7c-533321155a99/mzaf_15050664707608556027.plus.aac.p.m4a",
-        "durationMs": 177995,
-        "trackViewUrl": "https://music.apple.com/mx/album/tu-sancho/1804142476?i=1804142885&uo=4",
-        "genre": "Música mexicana",
-        "catalogResolved": true
-      },
-      {
-        "id": "1712363845",
-        "name": "EXCESOS",
-        "artistName": "Fuerza Regida",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/21/e3/b7/21e3b74f-571b-07ce-567b-a2aa8274c7b2/196871548922.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/excesos/1712362875?i=1712363845",
-        "catalogCountry": "mx",
-        "releaseDate": "2023-10-20T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "Pa las Baby's Y Belikeada",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/07/a6/b2/07a6b253-d59c-c85a-959e-fbec24abc26a/mzaf_10700723874153716546.plus.aac.p.m4a",
-        "durationMs": 187077,
-        "trackViewUrl": "https://music.apple.com/mx/album/excesos/1712362875?i=1712363845&uo=4",
-        "genre": "Música mexicana",
-        "catalogResolved": true
-      },
+    "co": [
       {
         "id": "1570323056",
         "name": "Yonaguni",
         "artistName": "Bad Bunny",
         "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b6/12/da/b612daba-6c68-c2ab-7492-fb2e079074d5/196006829308.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/yonaguni/1570323047?i=1570323056",
-        "catalogCountry": "mx",
+        "url": "https://music.apple.com/co/album/yonaguni/1570323047?i=1570323056",
+        "catalogCountry": "co",
         "releaseDate": "2021-06-04T07:00:00Z",
         "genres": [
           {
@@ -995,110 +949,18 @@
         "album": "Yonaguni - Single",
         "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/49/b9/6b/49b96b1c-aeee-7e22-ce0a-be17bab4a864/mzaf_5470366028981689473.plus.aac.p.m4a",
         "durationMs": 206710,
-        "trackViewUrl": "https://music.apple.com/mx/album/yonaguni/1570323047?i=1570323056&uo=4",
+        "trackViewUrl": "https://music.apple.com/co/album/yonaguni/1570323047?i=1570323056&uo=4",
         "genre": "Urbano latino",
         "catalogResolved": true
       },
       {
-        "id": "1804142886",
-        "name": "Marlboro Rojo",
-        "artistName": "Fuerza Regida",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/marlboro-rojo/1804142476?i=1804142886",
-        "catalogCountry": "mx",
-        "releaseDate": "2025-05-02T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "111XPANTIA",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bb/fb/48/bbfb484d-ed94-c835-b110-2075a22600ce/mzaf_15514896600297468899.plus.aac.p.m4a",
-        "durationMs": 184174,
-        "trackViewUrl": "https://music.apple.com/mx/album/marlboro-rojo/1804142476?i=1804142886&uo=4",
-        "genre": "Música mexicana",
-        "catalogResolved": true
-      },
-      {
-        "id": "1783250950",
-        "name": "gervonta",
-        "artistName": "Peso Pluma",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/39/ed/a6/39eda6fa-33fc-76da-238e-454c5ad8b73c/199066114025.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/gervonta/1783250949?i=1783250950",
-        "catalogCountry": "mx",
-        "releaseDate": "2024-12-05T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "gervonta - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c9/1f/ae/c91faeb1-658b-b58d-38da-35443be2200a/mzaf_9274918364104921427.plus.aac.p.m4a",
-        "durationMs": 167368,
-        "trackViewUrl": "https://music.apple.com/mx/album/gervonta/1783250949?i=1783250950&uo=4",
-        "genre": "Música mexicana",
-        "catalogResolved": true
-      },
-      {
-        "id": "1804142884",
-        "name": "ANSIEDAD",
-        "artistName": "Fuerza Regida",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/ansiedad/1804142476?i=1804142884",
-        "catalogCountry": "mx",
-        "releaseDate": "2025-05-02T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "111XPANTIA",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/88/44/f9/8844f9c2-778d-7755-869e-271a28a0a5a9/mzaf_10738123349559660324.plus.aac.p.m4a",
-        "durationMs": 151836,
-        "trackViewUrl": "https://music.apple.com/mx/album/ansiedad/1804142476?i=1804142884&uo=4",
-        "genre": "Música mexicana",
-        "catalogResolved": true
-      },
-      {
-        "id": "1748016028",
-        "name": "HOLLYWOOD",
-        "artistName": "Peso Pluma & Estevan Plazola",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/e9/65/3de9651e-fe11-0525-7eee-762861af1152/198391808319.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/hollywood/1748015447?i=1748016028",
-        "catalogCountry": "mx",
-        "releaseDate": "2024-06-20T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "ÉXODO",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/1c/7c/3a1c7c4c-4ea5-8646-aaea-4f878e65b95f/mzaf_4099277357364898295.plus.aac.p.m4a",
-        "durationMs": 284864,
-        "trackViewUrl": "https://music.apple.com/mx/album/hollywood/1748015447?i=1748016028&uo=4",
-        "genre": "Música mexicana",
-        "catalogResolved": true
-      },
-      {
-        "id": "1887113850",
-        "name": "Nalguita y Teta",
-        "artistName": "Neton Vega",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3d/94/07/3d94072e-4694-fdc5-2b3d-2b81f2f95b64/1963624427341_cover.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/nalguita-y-teta/1887113849?i=1887113850",
-        "catalogCountry": "mx",
-        "releaseDate": "2026-03-27T12:00:00Z",
+        "id": "1710983279",
+        "name": "PERRO NEGRO",
+        "artistName": "Bad Bunny & Feid",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/00/e0/31/00e0311e-9dab-fd0c-fc37-ee3d36aafbf3/197190137897.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/perro-negro/1710982865?i=1710983279",
+        "catalogCountry": "co",
+        "releaseDate": "2023-10-13T12:00:00Z",
         "genres": [
           {
             "name": "Música latina"
@@ -1107,11 +969,80 @@
             "name": "Música"
           }
         ],
-        "album": "Nalguita y Teta - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cf/62/0f/cf620f07-9a02-2bec-e58e-a6185cd82e29/mzaf_12902862987490796411.plus.aac.p.m4a",
-        "durationMs": 187765,
-        "trackViewUrl": "https://music.apple.com/mx/album/nalguita-y-teta/1887113849?i=1887113850&uo=4",
+        "album": "nadie sabe lo que va a pasar mañana",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7d/66/2f/7d662f25-7023-0301-f9dc-0e8ce7155a56/mzaf_11838409189562420602.plus.aac.p.m4a",
+        "durationMs": 162768,
+        "trackViewUrl": "https://music.apple.com/co/album/perro-negro/1710982865?i=1710983279&uo=4",
         "genre": "Música latina",
+        "catalogResolved": true
+      },
+      {
+        "id": "6779825388",
+        "name": "MERO TOTE",
+        "artistName": "Blessd, De La Rose & Los Money Makers",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/33/a1/e5/33a1e588-73c9-9bf1-54eb-91275332dde2/1200214359645.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/mero-tote/6779825180?i=6779825388",
+        "catalogCountry": "co",
+        "releaseDate": "2026-06-18T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ],
+        "album": "EL PEOR HOMBRE DEL MUNDO",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7a/80/3e/7a803e44-05be-e293-7461-baf3d7807757/mzaf_1040950032759875660.plus.aac.p.m4a",
+        "durationMs": 212784,
+        "trackViewUrl": "https://music.apple.com/co/album/mero-tote/6779825180?i=6779825388&uo=4",
+        "genre": "Música latina",
+        "catalogResolved": true
+      },
+      {
+        "id": "1865959223",
+        "name": "Dichavate",
+        "artistName": "Ya Ice Dilan, Rey Tony, Dj Honda & Helabusador",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a6/ea/be/a6eabeb7-b493-8920-2fcc-5209f43f335d/8605020139741.png/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/dichavate/1865959222?i=1865959223",
+        "catalogCountry": "co",
+        "releaseDate": "2025-12-24T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "Dichavate - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a1/07/a0/a107a093-7687-198f-5bce-42fa680343e9/mzaf_14570512102037173037.plus.aac.p.m4a",
+        "durationMs": 246429,
+        "trackViewUrl": "https://music.apple.com/co/album/dichavate/1865959222?i=1865959223&uo=4",
+        "genre": "Urbano latino",
+        "catalogResolved": true
+      },
+      {
+        "id": "1814164314",
+        "name": "Ojalá",
+        "artistName": "Ryan Castro",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8b/bb/06/8bbb0602-9d85-c28b-6de1-558f89f38bfa/196873157443.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/ojal%C3%A1/1814163356?i=1814164314",
+        "catalogCountry": "co",
+        "releaseDate": "2025-05-08T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "SENDÉ",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/38/90/b7/3890b745-62c1-b301-befa-c005ae6cea68/mzaf_16289251270600532947.plus.aac.p.m4a",
+        "durationMs": 156471,
+        "trackViewUrl": "https://music.apple.com/co/album/ojal%C3%A1/1814163356?i=1814164314&uo=4",
+        "genre": "Urbano latino",
         "catalogResolved": true
       },
       {
@@ -1119,8 +1050,8 @@
         "name": "Efecto",
         "artistName": "Bad Bunny",
         "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3e/04/eb/3e04ebf6-370f-f59d-ec84-2c2643db92f1/196626945068.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/efecto/1622045624?i=1622045954",
-        "catalogCountry": "mx",
+        "url": "https://music.apple.com/co/album/efecto/1622045624?i=1622045954",
+        "catalogCountry": "co",
         "releaseDate": "2022-05-06T12:00:00Z",
         "genres": [
           {
@@ -1133,18 +1064,18 @@
         "album": "Un Verano Sin Ti",
         "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4e/ec/7b/4eec7bd9-982c-bb39-4acb-77d724502e8a/mzaf_9582878707075648609.plus.aac.p.m4a",
         "durationMs": 213061,
-        "trackViewUrl": "https://music.apple.com/mx/album/efecto/1622045624?i=1622045954&uo=4",
+        "trackViewUrl": "https://music.apple.com/co/album/efecto/1622045624?i=1622045954&uo=4",
         "genre": "Música latina",
         "catalogResolved": true
       },
       {
-        "id": "1861943162",
-        "name": "daño",
-        "artistName": "Peso Pluma & Tito Double P",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e3/47/a9/e347a9c6-1cf0-6154-3976-b9dd615e2a83/199806514993.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/mx/album/da%C3%B1o/1861942827?i=1861943162",
-        "catalogCountry": "mx",
-        "releaseDate": "2025-12-25T12:00:00Z",
+        "id": "1877482633",
+        "name": "KOKO",
+        "artistName": "Omar Courtz",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0b/13/d6/0b13d6d1-d5b9-03f4-a7b8-29f00faad00f/820200317964.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/koko/1877481995?i=1877482633",
+        "catalogCountry": "co",
+        "releaseDate": "2026-02-19T12:00:00Z",
         "genres": [
           {
             "name": "Música"
@@ -1153,11 +1084,312 @@
             "name": "Música latina"
           }
         ],
-        "album": "DINASTÍA",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5f/a6/61/5fa661f1-6206-6c85-2db8-3c68838e65f0/mzaf_10189204612937272553.plus.aac.p.m4a",
-        "durationMs": 197008,
-        "trackViewUrl": "https://music.apple.com/mx/album/da%C3%B1o/1861942827?i=1861943162&uo=4",
-        "genre": "Música mexicana",
+        "album": "POR SI MAÑANA NO ESTOY",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/28/53/79/28537946-243b-1a52-6afa-099ae8730b6b/mzaf_8167427104880936555.plus.aac.p.m4a",
+        "durationMs": 195147,
+        "trackViewUrl": "https://music.apple.com/co/album/koko/1877481995?i=1877482633&uo=4",
+        "genre": "Urbano latino",
+        "catalogResolved": true
+      },
+      {
+        "id": "1882479567",
+        "name": "Pico Y Chao (W Sound 08)",
+        "artistName": "W Sound, Kris R. & Ovy On the Drums",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ac/e6/e8/ace6e85b-3fcc-39f1-34ab-3c153810a859/5026854835235.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/pico-y-chao-w-sound-08/1882479566?i=1882479567",
+        "catalogCountry": "co",
+        "releaseDate": "2026-03-05T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ],
+        "album": "Pico Y Chao (W Sound 08) - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2e/00/43/2e004302-d595-1823-d265-3dc8f1773465/mzaf_9745174609159513734.plus.aac.p.m4a",
+        "durationMs": 202804,
+        "trackViewUrl": "https://music.apple.com/co/album/pico-y-chao-w-sound-08/1882479566?i=1882479567&uo=4",
+        "genre": "Música latina",
+        "catalogResolved": true
+      },
+      {
+        "id": "1470146813",
+        "name": "LA CANCIÓN",
+        "artistName": "J Balvin & Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/77/32/74/7732746d-25e5-baae-b921-bad4a07d87b1/19UMGIM55524.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/la-canci%C3%B3n/1470146332?i=1470146813",
+        "catalogCountry": "co",
+        "releaseDate": "2019-08-02T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "OASIS",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cf/5f/ef/cf5fef49-8ab0-0d0b-f17a-d820cdca1d88/mzaf_3693019759359818051.plus.aac.p.m4a",
+        "durationMs": 242573,
+        "trackViewUrl": "https://music.apple.com/co/album/la-canci%C3%B3n/1470146332?i=1470146813&uo=4",
+        "genre": "Urbano latino",
+        "catalogResolved": true
+      },
+      {
+        "id": "6789281258",
+        "name": "A Xon De Que",
+        "artistName": "Feid",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e7/91/0c/e7910c76-ba72-6e2e-928c-e241d408b204/26UMGIM87502.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/a-xon-de-que/6789281255?i=6789281258",
+        "catalogCountry": "co",
+        "releaseDate": "2026-07-10T12:00:00Z",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ],
+        "album": "A Xon De Que - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/de/6e/24/de6e24dd-159b-5212-a7ca-e9521a89ef7b/mzaf_13529643601885177787.plus.aac.p.m4a",
+        "durationMs": 141465,
+        "trackViewUrl": "https://music.apple.com/co/album/a-xon-de-que/6789281255?i=6789281258&uo=4",
+        "genre": "Urbano latino",
+        "catalogResolved": true
+      }
+    ],
+    "gb": [
+      {
+        "id": "1817609509",
+        "name": "Man I Need",
+        "artistName": "Olivia Dean",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/man-i-need/1817609404?i=1817609509",
+        "catalogCountry": "gb",
+        "releaseDate": "2025-09-26T12:00:00Z",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "The Art of Loving",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/42/bb/5b/42bb5b21-2550-6205-bf3c-334b0e7d6199/mzaf_17462928687872215879.plus.aac.p.m4a",
+        "durationMs": 184000,
+        "trackViewUrl": "https://music.apple.com/gb/album/man-i-need/1817609404?i=1817609509&uo=4",
+        "genre": "Pop",
+        "catalogResolved": true
+      },
+      {
+        "id": "1820918468",
+        "name": "Rein Me In",
+        "artistName": "Sam Fender & Olivia Dean",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8f/0f/9f/8f0f9f3d-b26b-779d-d1f1-2db2154a68b7/25UMGIM75096.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/rein-me-in/1820918466?i=1820918468",
+        "catalogCountry": "gb",
+        "releaseDate": "2025-10-17T12:00:00Z",
+        "genres": [
+          {
+            "name": "Alternative"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "Rein Me In - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3c/4f/0d/3c4f0d98-9c3e-6c44-c796-e3ceb81a3f09/mzaf_3221627182838260274.plus.aac.p.m4a",
+        "durationMs": 339411,
+        "trackViewUrl": "https://music.apple.com/gb/album/rein-me-in/1820918466?i=1820918468&uo=4",
+        "genre": "Alternative",
+        "catalogResolved": true
+      },
+      {
+        "id": "1525933490",
+        "name": "Wonderwall (Remastered)",
+        "artistName": "Oasis",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/34/2e/cb/342ecb17-ef19-816a-4ce5-e60b9ceec161/5051961073164.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/wonderwall-remastered/1525933483?i=1525933490",
+        "catalogCountry": "gb",
+        "releaseDate": "1995-10-02T12:00:00Z",
+        "genres": [
+          {
+            "name": "Music"
+          },
+          {
+            "name": "Alternative"
+          }
+        ],
+        "album": "(What's The Story) Morning Glory? [Deluxe Remastered Edition]",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/ea/a8/c8/eaa8c8c2-3927-aa05-f2f2-8798104c0365/mzaf_2256330201720040258.plus.aac.p.m4a",
+        "durationMs": 258773,
+        "trackViewUrl": "https://music.apple.com/gb/album/wonderwall-remastered/1525933483?i=1525933490&uo=4",
+        "genre": "Indie Rock",
+        "catalogResolved": true
+      },
+      {
+        "id": "1870514330",
+        "name": "Talk To You (feat. 54 Ultra)",
+        "artistName": "ANOTR",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/6a/77/f9/6a77f93a-9286-60d8-3a0b-7d01a4b222cf/5665.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/talk-to-you-feat-54-ultra/1870514329?i=1870514330",
+        "catalogCountry": "gb",
+        "releaseDate": "2026-03-06T12:00:00Z",
+        "genres": [
+          {
+            "name": "Dance"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "Talk To You (feat. 54 Ultra) - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/aa/c0/52/aac05210-37d4-0d74-5013-48156d87d74c/mzaf_573344203389765709.plus.aac.p.m4a",
+        "durationMs": 191077,
+        "trackViewUrl": "https://music.apple.com/gb/album/talk-to-you-feat-54-ultra/1870514329?i=1870514330&uo=4",
+        "genre": "Dance",
+        "catalogResolved": true
+      },
+      {
+        "id": "6769070199",
+        "name": "Movin' To The Sun",
+        "artistName": "HUGEL, Imael Angel & Ultra Naté",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/96/61/7a/96617ab5-51da-7cfc-97e5-c5a6a893c210/1087654.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/movin-to-the-sun/6769069923?i=6769070199",
+        "catalogCountry": "gb",
+        "releaseDate": "2026-05-22T12:00:00Z",
+        "genres": [
+          {
+            "name": "Electronic"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "Movin' To The Sun - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a9/d2/09/a9d209b4-55a5-67e8-2e15-949cb00e716d/mzaf_11935934741751979581.plus.aac.p.m4a",
+        "durationMs": 142200,
+        "trackViewUrl": "https://music.apple.com/gb/album/movin-to-the-sun/6769069923?i=6769070199&uo=4",
+        "genre": "Electronic",
+        "catalogResolved": true
+      },
+      {
+        "id": "1844932150",
+        "name": "Choosin' Texas",
+        "artistName": "Ella Langley",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/91/4d/e2914d0a-7f1d-f04c-fbf4-c50b38548838/196873638690.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/choosin-texas/1844932149?i=1844932150",
+        "catalogCountry": "gb",
+        "releaseDate": "2025-10-17T12:00:00Z",
+        "genres": [
+          {
+            "name": "Country"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "Choosin' Texas - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/38/49/4c/38494cb4-f9e0-1db4-0b84-8c478cb55390/mzaf_4251933786704889664.plus.aac.p.m4a",
+        "durationMs": 232226,
+        "trackViewUrl": "https://music.apple.com/gb/album/choosin-texas/1844932149?i=1844932150&uo=4",
+        "genre": "Country",
+        "catalogResolved": true
+      },
+      {
+        "id": "1889992115",
+        "name": "stupid song",
+        "artistName": "Olivia Rodrigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/stupid-song/1889992111?i=1889992115",
+        "catalogCountry": "gb",
+        "releaseDate": "2026-06-12T07:00:00Z",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "you seem pretty sad for a girl so in love",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/d6/78/abd678a1-bf4e-7ee9-d0b2-ba8afee10914/mzaf_3280183609788906841.plus.aac.p.m4a",
+        "durationMs": 209680,
+        "trackViewUrl": "https://music.apple.com/gb/album/stupid-song/1889992111?i=1889992115&uo=4",
+        "genre": "Pop",
+        "catalogResolved": true
+      },
+      {
+        "id": "1889992123",
+        "name": "the cure",
+        "artistName": "Olivia Rodrigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/the-cure/1889992111?i=1889992123",
+        "catalogCountry": "gb",
+        "releaseDate": "2026-05-22T07:00:00Z",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "you seem pretty sad for a girl so in love",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a5/bc/1e/a5bc1e73-55d7-3835-4020-cb005f8a3b3d/mzaf_15167349291907334066.plus.aac.p.m4a",
+        "durationMs": 297090,
+        "trackViewUrl": "https://music.apple.com/gb/album/the-cure/1889992111?i=1889992123&uo=4",
+        "genre": "Pop",
+        "catalogResolved": true
+      },
+      {
+        "id": "1884097804",
+        "name": "Free Your Mind",
+        "artistName": "Prospa & Cloonee",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/15/eb/a6/15eba69b-6089-53a7-3106-5c7dfac97677/820200577436.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/free-your-mind/1884097801?i=1884097804",
+        "catalogCountry": "gb",
+        "releaseDate": "2026-03-27T12:00:00Z",
+        "genres": [
+          {
+            "name": "Dance"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "Free Your Mind - Single",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ef/eb/29/efeb2948-724e-95e3-4611-fcf47d933b15/mzaf_12439285597506860703.plus.aac.p.m4a",
+        "durationMs": 201700,
+        "trackViewUrl": "https://music.apple.com/gb/album/free-your-mind/1884097801?i=1884097804&uo=4",
+        "genre": "Dance",
+        "catalogResolved": true
+      },
+      {
+        "id": "6769568596",
+        "name": "Janice STFU",
+        "artistName": "Drake",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/35/b9/06/35b90629-a873-14f8-4789-ffc324960038/26UMGIM63614.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/janice-stfu/6769568449?i=6769568596",
+        "catalogCountry": "gb",
+        "releaseDate": "2026-05-15T12:00:00Z",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ],
+        "album": "ICEMAN",
+        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a2/a3/18/a2a31893-76db-627e-0985-6c720be140b4/mzaf_4732841734320991384.plus.aac.p.m4a",
+        "durationMs": 237344,
+        "trackViewUrl": "https://music.apple.com/gb/album/janice-stfu/6769568449?i=6769568596&uo=4",
+        "genre": "Hip-Hop/Rap",
         "catalogResolved": true
       }
     ],
@@ -1390,238 +1622,6 @@
         "durationMs": 286053,
         "trackViewUrl": "https://music.apple.com/jp/album/%E8%8A%B1%E6%9D%9F/1451570468?i=1451570480&uo=4",
         "genre": "J-Pop",
-        "catalogResolved": true
-      }
-    ],
-    "co": [
-      {
-        "id": "1570323056",
-        "name": "Yonaguni",
-        "artistName": "Bad Bunny",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b6/12/da/b612daba-6c68-c2ab-7492-fb2e079074d5/196006829308.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/yonaguni/1570323047?i=1570323056",
-        "catalogCountry": "co",
-        "releaseDate": "2021-06-04T07:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "Yonaguni - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/49/b9/6b/49b96b1c-aeee-7e22-ce0a-be17bab4a864/mzaf_5470366028981689473.plus.aac.p.m4a",
-        "durationMs": 206710,
-        "trackViewUrl": "https://music.apple.com/co/album/yonaguni/1570323047?i=1570323056&uo=4",
-        "genre": "Urbano latino",
-        "catalogResolved": true
-      },
-      {
-        "id": "1710983279",
-        "name": "PERRO NEGRO",
-        "artistName": "Bad Bunny & Feid",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/00/e0/31/00e0311e-9dab-fd0c-fc37-ee3d36aafbf3/197190137897.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/perro-negro/1710982865?i=1710983279",
-        "catalogCountry": "co",
-        "releaseDate": "2023-10-13T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música latina"
-          },
-          {
-            "name": "Música"
-          }
-        ],
-        "album": "nadie sabe lo que va a pasar mañana",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7d/66/2f/7d662f25-7023-0301-f9dc-0e8ce7155a56/mzaf_11838409189562420602.plus.aac.p.m4a",
-        "durationMs": 162768,
-        "trackViewUrl": "https://music.apple.com/co/album/perro-negro/1710982865?i=1710983279&uo=4",
-        "genre": "Música latina",
-        "catalogResolved": true
-      },
-      {
-        "id": "6779825388",
-        "name": "MERO TOTE",
-        "artistName": "Blessd, De La Rose & Los Money Makers",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/33/a1/e5/33a1e588-73c9-9bf1-54eb-91275332dde2/1200214359645.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/mero-tote/6779825180?i=6779825388",
-        "catalogCountry": "co",
-        "releaseDate": "2026-06-18T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música latina"
-          },
-          {
-            "name": "Música"
-          }
-        ],
-        "album": "EL PEOR HOMBRE DEL MUNDO",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7a/80/3e/7a803e44-05be-e293-7461-baf3d7807757/mzaf_1040950032759875660.plus.aac.p.m4a",
-        "durationMs": 212784,
-        "trackViewUrl": "https://music.apple.com/co/album/mero-tote/6779825180?i=6779825388&uo=4",
-        "genre": "Música latina",
-        "catalogResolved": true
-      },
-      {
-        "id": "1865959223",
-        "name": "Dichavate",
-        "artistName": "Ya Ice Dilan, Rey Tony, Dj Honda & Helabusador",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a6/ea/be/a6eabeb7-b493-8920-2fcc-5209f43f335d/8605020139741.png/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/dichavate/1865959222?i=1865959223",
-        "catalogCountry": "co",
-        "releaseDate": "2025-12-24T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "Dichavate - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a1/07/a0/a107a093-7687-198f-5bce-42fa680343e9/mzaf_14570512102037173037.plus.aac.p.m4a",
-        "durationMs": 246429,
-        "trackViewUrl": "https://music.apple.com/co/album/dichavate/1865959222?i=1865959223&uo=4",
-        "genre": "Urbano latino",
-        "catalogResolved": true
-      },
-      {
-        "id": "1814164314",
-        "name": "Ojalá",
-        "artistName": "Ryan Castro",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8b/bb/06/8bbb0602-9d85-c28b-6de1-558f89f38bfa/196873157443.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/ojal%C3%A1/1814163356?i=1814164314",
-        "catalogCountry": "co",
-        "releaseDate": "2025-05-08T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "SENDÉ",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/38/90/b7/3890b745-62c1-b301-befa-c005ae6cea68/mzaf_16289251270600532947.plus.aac.p.m4a",
-        "durationMs": 156471,
-        "trackViewUrl": "https://music.apple.com/co/album/ojal%C3%A1/1814163356?i=1814164314&uo=4",
-        "genre": "Urbano latino",
-        "catalogResolved": true
-      },
-      {
-        "id": "1622045954",
-        "name": "Efecto",
-        "artistName": "Bad Bunny",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3e/04/eb/3e04ebf6-370f-f59d-ec84-2c2643db92f1/196626945068.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/efecto/1622045624?i=1622045954",
-        "catalogCountry": "co",
-        "releaseDate": "2022-05-06T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música latina"
-          },
-          {
-            "name": "Música"
-          }
-        ],
-        "album": "Un Verano Sin Ti",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4e/ec/7b/4eec7bd9-982c-bb39-4acb-77d724502e8a/mzaf_9582878707075648609.plus.aac.p.m4a",
-        "durationMs": 213061,
-        "trackViewUrl": "https://music.apple.com/co/album/efecto/1622045624?i=1622045954&uo=4",
-        "genre": "Música latina",
-        "catalogResolved": true
-      },
-      {
-        "id": "1877482633",
-        "name": "KOKO",
-        "artistName": "Omar Courtz",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0b/13/d6/0b13d6d1-d5b9-03f4-a7b8-29f00faad00f/820200317964.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/koko/1877481995?i=1877482633",
-        "catalogCountry": "co",
-        "releaseDate": "2026-02-19T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "POR SI MAÑANA NO ESTOY",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/28/53/79/28537946-243b-1a52-6afa-099ae8730b6b/mzaf_8167427104880936555.plus.aac.p.m4a",
-        "durationMs": 195147,
-        "trackViewUrl": "https://music.apple.com/co/album/koko/1877481995?i=1877482633&uo=4",
-        "genre": "Urbano latino",
-        "catalogResolved": true
-      },
-      {
-        "id": "1882479567",
-        "name": "Pico Y Chao (W Sound 08)",
-        "artistName": "W Sound, Kris R. & Ovy On the Drums",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ac/e6/e8/ace6e85b-3fcc-39f1-34ab-3c153810a859/5026854835235.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/pico-y-chao-w-sound-08/1882479566?i=1882479567",
-        "catalogCountry": "co",
-        "releaseDate": "2026-03-05T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música latina"
-          },
-          {
-            "name": "Música"
-          }
-        ],
-        "album": "Pico Y Chao (W Sound 08) - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2e/00/43/2e004302-d595-1823-d265-3dc8f1773465/mzaf_9745174609159513734.plus.aac.p.m4a",
-        "durationMs": 202804,
-        "trackViewUrl": "https://music.apple.com/co/album/pico-y-chao-w-sound-08/1882479566?i=1882479567&uo=4",
-        "genre": "Música latina",
-        "catalogResolved": true
-      },
-      {
-        "id": "1470146813",
-        "name": "LA CANCIÓN",
-        "artistName": "J Balvin & Bad Bunny",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/77/32/74/7732746d-25e5-baae-b921-bad4a07d87b1/19UMGIM55524.rgb.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/la-canci%C3%B3n/1470146332?i=1470146813",
-        "catalogCountry": "co",
-        "releaseDate": "2019-08-02T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "OASIS",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cf/5f/ef/cf5fef49-8ab0-0d0b-f17a-d820cdca1d88/mzaf_3693019759359818051.plus.aac.p.m4a",
-        "durationMs": 242573,
-        "trackViewUrl": "https://music.apple.com/co/album/la-canci%C3%B3n/1470146332?i=1470146813&uo=4",
-        "genre": "Urbano latino",
-        "catalogResolved": true
-      },
-      {
-        "id": "6789281258",
-        "name": "A Xon De Que",
-        "artistName": "Feid",
-        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e7/91/0c/e7910c76-ba72-6e2e-928c-e241d408b204/26UMGIM87502.rgb.jpg/100x100bb.jpg",
-        "url": "https://music.apple.com/co/album/a-xon-de-que/6789281255?i=6789281258",
-        "catalogCountry": "co",
-        "releaseDate": "2026-07-10T12:00:00Z",
-        "genres": [
-          {
-            "name": "Música"
-          },
-          {
-            "name": "Música latina"
-          }
-        ],
-        "album": "A Xon De Que - Single",
-        "previewUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/de/6e/24/de6e24dd-159b-5212-a7ca-e9521a89ef7b/mzaf_13529643601885177787.plus.aac.p.m4a",
-        "durationMs": 141465,
-        "trackViewUrl": "https://music.apple.com/co/album/a-xon-de-que/6789281255?i=6789281258&uo=4",
-        "genre": "Urbano latino",
         "catalogResolved": true
       }
     ],

@@ -7,24 +7,31 @@ const countries = ['mx', 'us', 'es', 'ar', 'co', 'gb', 'jp'];
 const output = path.join(__dirname, '..', 'data', 'charts.json');
 
 async function build() {
+  const previous = readPreviousCharts();
   const charts = {};
-  await Promise.all(countries.map(async country => {
-    const url = `https://rss.marketingtools.apple.com/api/v2/${country}/music/most-played/10/songs.json`;
-    const response = await fetch(url, { headers: { 'User-Agent': 'LyraCharts/2.0' } });
-    if (!response.ok) throw new Error(`${country}: ${response.status}`);
-    const data = await response.json();
-    const feedItems = (data.feed?.results || []).slice(0, 10).map(item => ({
-      id: item.id,
-      name: item.name,
-      artistName: item.artistName,
-      artworkUrl100: item.artworkUrl100,
-      url: item.url,
-      catalogCountry: country,
-      releaseDate: item.releaseDate,
-      genres: item.genres?.slice(0, 2).map(genre => ({ name: genre.name })) || [],
-    }));
-    charts[country] = await hydrateCatalog(country, feedItems);
-  }));
+  for (const country of countries) {
+    try {
+      const url = `https://rss.marketingtools.apple.com/api/v2/${country}/music/most-played/10/songs.json`;
+      const data = await fetchJsonWithRetry(url, { headers: { 'User-Agent': 'LyraCharts/2.1' } });
+      const feedItems = (data.feed?.results || []).slice(0, 10).map(item => ({
+        id: item.id,
+        name: item.name,
+        artistName: item.artistName,
+        artworkUrl100: item.artworkUrl100,
+        url: item.url,
+        catalogCountry: country,
+        releaseDate: item.releaseDate,
+        genres: item.genres?.slice(0, 2).map(genre => ({ name: genre.name })) || [],
+      }));
+      if (feedItems.length !== 10) throw new Error(`${country}: incomplete feed`);
+      charts[country] = await hydrateCatalog(country, feedItems, previous?.charts?.[country]);
+    } catch (error) {
+      const fallback = previous?.charts?.[country];
+      if (!Array.isArray(fallback) || fallback.length !== 10) throw error;
+      console.warn(`Chart ${country} kept the previous verified snapshot: ${error.message}`);
+      charts[country] = fallback;
+    }
+  }
 
   const globalScores = new Map();
   for (const country of countries) {
@@ -45,22 +52,21 @@ async function build() {
   console.log(`Built ${Object.keys(charts).length} charts at ${output}`);
 }
 
-async function hydrateCatalog(country, items) {
+async function hydrateCatalog(country, items, previousItems = []) {
   const ids = items.map(item => item.id).filter(Boolean).join(',');
   if (!ids) return items;
+  const previousById = new Map((previousItems || []).map(item => [String(item.id), item]));
   try {
     const params = new URLSearchParams({ id: ids, country: country.toUpperCase(), entity: 'song' });
-    const response = await fetch(`https://itunes.apple.com/lookup?${params}`, {
+    const payload = await fetchJsonWithRetry(`https://itunes.apple.com/lookup?${params}`, {
       headers: { 'User-Agent': 'LyraCharts/2.1' },
     });
-    if (!response.ok) throw new Error(`${country} catalog: ${response.status}`);
-    const payload = await response.json();
     const byId = new Map((payload.results || [])
       .filter(record => record.wrapperType === 'track' && record.kind === 'song')
       .map(record => [String(record.trackId), record]));
     return items.map(item => {
       const record = byId.get(String(item.id));
-      if (!record) return item;
+      if (!record) return previousById.get(String(item.id)) || item;
       return {
         ...item,
         name: record.trackName || item.name,
@@ -77,8 +83,31 @@ async function hydrateCatalog(country, items) {
     });
   } catch (error) {
     console.warn(`Chart ${country} kept its exact feed metadata: ${error.message}`);
-    return items;
+    return items.map(item => previousById.get(String(item.id)) || item);
   }
+}
+
+function readPreviousCharts() {
+  try {
+    return JSON.parse(fs.readFileSync(output, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+async function fetchJsonWithRetry(url, options = {}, attempts = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error(`${new URL(url).hostname}: ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await new Promise(resolve => setTimeout(resolve, attempt * 700));
+    }
+  }
+  throw lastError;
 }
 
 build().catch(error => {

@@ -202,8 +202,18 @@
     $$('.filter-tabs button').forEach((button, index) => {
       button.addEventListener('click', () => {
         state.filter = button.dataset.filter;
-        $$('.filter-tabs button').forEach(b => b.classList.remove('active'));
+        $$('.filter-tabs button').forEach(b => {
+          const active = b === button;
+          b.classList.toggle('active', active);
+          b.setAttribute('aria-selected', String(active));
+        });
         button.classList.add('active');
+        els.searchInput.placeholder = ({
+          all: 'Título, artista o álbum...',
+          song: 'Nombre de la canción...',
+          artist: 'Nombre del artista...',
+          album: 'Nombre del álbum...',
+        })[state.filter] || 'Buscar música...';
         const indicator = $('.tab-indicator');
         const tabWidth = button.offsetWidth;
         indicator.style.width = `${tabWidth}px`;
@@ -624,20 +634,20 @@
   }
 
   async function directAppleSearch(query, signal) {
-    const attribute = state.filter === 'artist' ? 'artistTerm' : state.filter === 'album' ? 'albumTerm' : state.filter === 'song' ? 'songTerm' : '';
-    const params = new URLSearchParams({ term: query, media: 'music', entity: 'song', limit: '24', country: 'MX' });
-    if (attribute) params.set('attribute', attribute);
-    const response = await fetchWithDeadline(`https://itunes.apple.com/search?${params}`, { signal }, 8000);
-    if (!response.ok) throw new Error(`Apple catalog failed ${response.status}`);
-    const data = await response.json();
-    return (data.results || []).map(normalizeAppleTrack);
+    return searchAppleCatalogs(query, signal);
   }
 
   async function searchAppleCatalogs(query, signal) {
-    const attribute = state.filter === 'artist' ? 'artistTerm' : state.filter === 'album' ? 'albumTerm' : state.filter === 'song' ? 'songTerm' : '';
+    if (state.filter === 'album') return searchAppleAlbumTracks(query, signal);
+    return searchAppleSongCatalogs(query, signal, state.filter);
+  }
+
+  async function searchAppleSongCatalogs(query, signal, mode = 'all') {
     const markets = ['MX', 'US', 'ES'];
-    const settled = await Promise.allSettled(markets.map(async country => {
-      const params = new URLSearchParams({ term: query, media: 'music', entity: 'song', limit: '24', country });
+    const attributes = mode === 'song' ? ['songTerm', ''] : mode === 'artist' ? ['artistTerm'] : [''];
+    const requests = markets.flatMap(country => attributes.map(attribute => ({ country, attribute })));
+    const settled = await Promise.allSettled(requests.map(async ({ country, attribute }) => {
+      const params = new URLSearchParams({ term: query, media: 'music', entity: 'song', limit: '32', country });
       if (attribute) params.set('attribute', attribute);
       const response = await fetchWithDeadline(`https://itunes.apple.com/search?${params}`, { signal }, 8000);
       if (!response.ok) throw new Error(`Apple ${country} failed ${response.status}`);
@@ -648,7 +658,59 @@
       if (result.status !== 'fulfilled') return;
       result.value.forEach(track => byId.set(trackId(track), track));
     });
-    return [...byId.values()];
+    return rankTracksForMode([...byId.values()], query, mode);
+  }
+
+  async function searchAppleAlbumTracks(query, signal) {
+    const markets = ['MX', 'US', 'ES'];
+    const requests = markets.flatMap(country => ['albumTerm', ''].map(attribute => ({ country, attribute })));
+    const albumSearches = await Promise.allSettled(requests.map(async ({ country, attribute }) => {
+      const params = new URLSearchParams({ term: query, media: 'music', entity: 'album', limit: '12', country });
+      if (attribute) params.set('attribute', attribute);
+      const response = await fetchWithDeadline(`https://itunes.apple.com/search?${params}`, { signal }, 8000);
+      if (!response.ok) throw new Error(`Apple albums ${country} failed ${response.status}`);
+      const data = await response.json();
+      return (data.results || []).map(album => ({ ...album, catalogCountry: country }));
+    }));
+    const albumsById = new Map();
+    albumSearches.forEach(result => {
+      if (result.status !== 'fulfilled') return;
+      result.value.forEach(album => {
+        if (album.collectionId && !albumsById.has(String(album.collectionId))) albumsById.set(String(album.collectionId), album);
+      });
+    });
+    const albums = [...albumsById.values()]
+      .filter(album => passesSearchMode({ title: '', artist: album.artistName, album: album.collectionName }, query, 'album'))
+      .sort((a, b) => modeMatchScore({ title: '', artist: b.artistName, album: b.collectionName }, query, 'album')
+        - modeMatchScore({ title: '', artist: a.artistName, album: a.collectionName }, query, 'album'))
+      .slice(0, 8);
+    if (!albums.length) return [];
+
+    const albumsByMarket = albums.reduce((groups, album) => {
+      const country = album.catalogCountry || 'MX';
+      (groups[country] ||= []).push(album);
+      return groups;
+    }, {});
+    const lookups = await Promise.allSettled(Object.entries(albumsByMarket).map(async ([country, marketAlbums]) => {
+      const params = new URLSearchParams({
+        id: marketAlbums.map(album => album.collectionId).join(','),
+        entity: 'song',
+        limit: '200',
+        country,
+      });
+      const response = await fetchWithDeadline(`https://itunes.apple.com/lookup?${params}`, { signal }, 9000);
+      if (!response.ok) throw new Error(`Apple album lookup ${country} failed ${response.status}`);
+      const data = await response.json();
+      return (data.results || [])
+        .filter(item => item.wrapperType === 'track' && item.kind === 'song')
+        .map(item => ({ ...normalizeAppleTrack(item), source: 'apple', trackNumber: Number(item.trackNumber || 0) }));
+    }));
+    const tracksById = new Map();
+    lookups.forEach(result => {
+      if (result.status !== 'fulfilled') return;
+      result.value.forEach(track => tracksById.set(trackId(track), track));
+    });
+    return rankTracksForMode([...tracksById.values()], query, 'album');
   }
 
   async function searchYouTube(query, signal, force = false) {
@@ -715,16 +777,10 @@
     };
   }
 
-  function mergeSearchResults(apple, youtube, query) {
-    const queryTokens = normalizeSearchText(query).split(' ').filter(token => token.length > 1);
-    const scored = [...apple, ...youtube].map(track => {
-      const haystack = normalizeSearchText(`${track.title} ${track.artist} ${track.album || ''}`);
-      const title = normalizeSearchText(track.title);
-      const allTokens = queryTokens.length && queryTokens.every(token => haystack.includes(token));
-      const score = (allTokens ? 100 : 0) + queryTokens.filter(token => haystack.includes(token)).length * 12
-        + (title === normalizeSearchText(query) ? 35 : 0);
-      return { track, score };
-    });
+  function mergeSearchResults(apple, youtube, query, mode = state.filter) {
+    const scored = [...apple, ...youtube]
+      .filter(track => passesSearchMode(track, query, mode))
+      .map(track => ({ track, score: modeMatchScore(track, query, mode) }));
     const seen = new Set();
     return scored.sort((a, b) => b.score - a.score).filter(({ track }) => {
       const signature = normalizeSearchText(`${track.title}|${track.artist}`);
@@ -734,14 +790,51 @@
     }).slice(0, 30).map(({ track }) => track);
   }
 
+  function rankTracksForMode(tracks, query, mode) {
+    return tracks
+      .filter(track => passesSearchMode(track, query, mode))
+      .sort((a, b) => modeMatchScore(b, query, mode) - modeMatchScore(a, query, mode));
+  }
+
+  function passesSearchMode(track, query, mode) {
+    if (mode === 'all') return true;
+    const tokens = normalizeSearchText(query).split(' ').filter(token => token.length > 1);
+    if (!tokens.length) return true;
+    const title = normalizeSearchText(track.title);
+    const artist = normalizeSearchText(track.artist);
+    const album = normalizeSearchText(track.album);
+    const field = mode === 'artist' ? artist : mode === 'album' ? `${album} ${artist}` : `${title} ${artist}`;
+    const primary = mode === 'artist' ? artist : mode === 'album' ? album : title;
+    const queryText = normalizeSearchText(query);
+    const fieldMatches = tokens.filter(token => field.includes(token)).length;
+    const primaryMatches = tokens.filter(token => primary.includes(token)).length;
+    if (primary.includes(queryText) || queryText.includes(primary)) return true;
+    if (mode === 'artist') return fieldMatches / tokens.length >= .6;
+    return primaryMatches > 0 && fieldMatches === tokens.length;
+  }
+
+  function modeMatchScore(track, query, mode) {
+    const queryText = normalizeSearchText(query);
+    const tokens = queryText.split(' ').filter(token => token.length > 1);
+    const title = normalizeSearchText(track.title);
+    const artist = normalizeSearchText(track.artist);
+    const album = normalizeSearchText(track.album);
+    const primary = mode === 'artist' ? artist : mode === 'album' ? album : mode === 'song' ? title : `${title} ${artist} ${album}`;
+    const secondary = mode === 'artist' ? `${title} ${album}` : mode === 'album' ? artist : mode === 'song' ? artist : '';
+    const primaryMatches = tokens.filter(token => primary.includes(token)).length;
+    const secondaryMatches = tokens.filter(token => secondary.includes(token)).length;
+    return (primary === queryText ? 320 : 0)
+      + (primary.startsWith(queryText) ? 180 : 0)
+      + (primary.includes(queryText) ? 140 : 0)
+      + primaryMatches * 34
+      + secondaryMatches * 9
+      + (tokens.length && primaryMatches === tokens.length ? 80 : 0)
+      + (track.source === 'apple' ? 3 : 0);
+  }
+
   function needsYouTubeFallback(results, query) {
     if (!youtubeApiKey || state.filter === 'album') return false;
-    const tokens = normalizeSearchText(query).split(' ').filter(token => token.length > 1);
-    if (!tokens.length) return false;
-    const strongMatches = results.filter(track => {
-      const haystack = normalizeSearchText(`${track.title} ${track.artist}`);
-      return tokens.every(token => haystack.includes(token));
-    });
+    const strongMatches = results.filter(track => passesSearchMode(track, query, state.filter));
     return strongMatches.length < 3;
   }
 
@@ -1030,7 +1123,7 @@
         return;
       }
       const candidates = await searchYouTube(`${track.title} ${track.artist} official audio`, controller.signal, true);
-      const rankedMatches = mergeSearchResults([], candidates, `${track.title} ${track.artist}`);
+      const rankedMatches = mergeSearchResults([], candidates, `${track.title} ${track.artist}`, 'song');
       const targetDuration = Number(track.durationMs || 0);
       const match = targetDuration
         ? rankedMatches.find(candidate => candidate.durationMs && Math.abs(candidate.durationMs - targetDuration) <= 22000) || rankedMatches[0]

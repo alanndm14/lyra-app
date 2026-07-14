@@ -17,7 +17,7 @@ for (const id of ['entryGate', 'appShell', 'chartList', 'playerOverlay', 'beatSt
   assert(ids.includes(id), `Missing required UI id: ${id}`);
 }
 
-assert(html.includes('styles.css?v=13') && html.includes('app.js?v=13') && html.includes('runtime-config.js?v=13'), 'Public asset versions are not aligned');
+assert(html.includes('styles.css?v=14') && html.includes('app.js?v=14') && html.includes('runtime-config.js?v=14'), 'Public asset versions are not aligned');
 assert(app.includes(".join(' ')}<small class=\"lyric-translation\""), 'Lyric words are rendered without explicit spaces');
 assert(app.includes('itunes.apple.com/lookup?'), 'Chart entries are not resolved through exact catalog lookup');
 assert(app.includes('googleapis.com/youtube/v3/search'), 'YouTube search fallback is missing');
@@ -46,6 +46,10 @@ assert(app.includes('videoToLyricTime(currentTime)') && app.includes('lyricToVid
 assert(app.includes('requestBrowserTranslation') && app.includes('requestNetworkTranslation') && app.includes('translationRetryCount'), 'Translation fallbacks are incomplete');
 assert(css.includes('.player-overlay.intro-presenting .cinema-intro') && app.includes('startCinemaSequence()'), 'Cinematic entry sequence is missing');
 assert(!css.includes('.control-pill:not([data-mode="cinematic"]) { display:none; }'), 'Mobile lyric modes are still hidden');
+assert(app.includes("if (state.filter === 'album') return searchAppleAlbumTracks") && app.includes("entity: 'album', limit: '12'"), 'Album filter does not resolve real albums');
+assert(app.includes("mode === 'artist' ? ['artistTerm']") && app.includes('passesSearchMode(track, query, mode)'), 'Artist filter is not isolated from other search fields');
+assert(app.includes("mode === 'song' ? ['songTerm', '']") && app.includes('modeMatchScore(track, query, mode)'), 'Song filter does not prioritize titles');
+assert(app.includes("entity: 'song',") && app.includes('albumsByMarket'), 'Album tracks are not loaded from the selected collections');
 
 const markets = Object.entries(chartBundle.charts || {});
 assert(markets.length >= 8, 'Expected global plus seven country charts');

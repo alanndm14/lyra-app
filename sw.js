@@ -1,5 +1,5 @@
-const CACHE = 'lyra-shell-v3';
-const SHELL = ['./', './index.html', './styles.css?v=3', './app.js?v=3', './manifest.json?v=3'];
+const CACHE = 'lyra-shell-v4';
+const SHELL = ['./', './index.html', './styles.css?v=4', './app.js?v=4', './manifest.json?v=4', './data/charts.json'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));

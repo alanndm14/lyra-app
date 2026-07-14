@@ -24,10 +24,14 @@
     lyricsController: null,
     lyricsCache: new Map(),
     lyricsMessageTimer: null,
+    backgroundReady: false,
+    lyricsReady: false,
+    cinemaEnded: false,
+    returnToResults: false,
     motion: localStorage.getItem('lyra:motion') !== 'off',
     favorites: readStore('lyra:favorites', []),
     history: readStore('lyra:history', []),
-    themeIndex: 0,
+    themeIndex: Math.max(0, Math.min(4, Number(localStorage.getItem('lyra:theme')) || 0)),
     currentView: 'discover',
   };
 
@@ -72,6 +76,14 @@
     lyricEcho: $('#lyricEcho'),
     lyricTotal: $('#lyricTotal'),
     syncState: $('#syncState'),
+    entryGate: $('#entryGate'),
+    environmentPanel: $('#environmentPanel'),
+    environmentBackdrop: $('#environmentBackdrop'),
+    chartList: $('#chartList'),
+    beatStage: $('#beatStage'),
+    cinemaLoader: $('#cinemaLoader'),
+    cinemaLoaderText: $('#cinemaLoaderText'),
+    endCredits: $('#endCredits'),
   };
 
   init();
@@ -82,9 +94,13 @@
     initTilt();
     initMagnetic();
     initCarouselDrag();
+    initEntry();
+    initDiscovery();
+    initBeatStage();
     setMotion(state.motion);
     renderLibraries();
-    setTheme(themes[0]);
+    setTheme(themes[state.themeIndex] || themes[0]);
+    loadChart('global');
     registerServiceWorker();
   }
 
@@ -92,16 +108,27 @@
     $('#searchTrigger').addEventListener('click', openSearch);
     $('#heroSearchBtn').addEventListener('click', openSearch);
     $('#mobileSearch').addEventListener('click', openSearch);
+    $('#mobileEnvironment').addEventListener('click', openEnvironment);
     $('#demoBtn').addEventListener('click', openDemoTrack);
+    $('#enterLyra').addEventListener('click', enterApp);
     $('#surpriseBtn').addEventListener('click', surpriseMe);
     $('#vibeShuffle').addEventListener('click', cycleTheme);
-    $('#themeCycle').addEventListener('click', cycleTheme);
+    $('#themeCycle').addEventListener('click', openEnvironment);
+    $('#environmentClose').addEventListener('click', closeEnvironment);
+    els.environmentBackdrop.addEventListener('click', closeEnvironment);
     $('#motionToggle').addEventListener('click', () => setMotion(!state.motion));
     $('#openAllMoods').addEventListener('click', () => runSearch('popular music'));
 
     $$('[data-close-search]').forEach(el => el.addEventListener('click', closeSearch));
-    $('#playerClose').addEventListener('click', closePlayer);
-    $('.player-backdrop').addEventListener('click', closePlayer);
+    $('#playerClose').addEventListener('click', returnFromPlayer);
+    $('.player-backdrop').addEventListener('click', returnFromPlayer);
+    $('#replayExperience').addEventListener('click', replayExperience);
+
+    $('#homeSearchForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const query = $('#homeSearchInput').value.trim();
+      if (query) runSearch(query);
+    });
 
     els.searchForm.addEventListener('submit', event => {
       event.preventDefault();
@@ -109,8 +136,23 @@
       if (query) searchMusic(query);
     });
 
-    $$('.search-suggestions [data-query], .quick-card[data-query], .mood-tile[data-query]').forEach(button => {
+    $$('.search-suggestions [data-query], .quick-card[data-query], .mood-tile[data-query], .search-prompts [data-query]').forEach(button => {
       button.addEventListener('click', () => runSearch(button.dataset.query));
+    });
+
+    $$('.environment-presets [data-theme]').forEach(button => {
+      button.addEventListener('click', () => selectEnvironment(Number(button.dataset.theme)));
+    });
+
+    $$('#countryTabs [data-country]').forEach(button => {
+      button.addEventListener('click', () => {
+        $$('#countryTabs [data-country]').forEach(item => {
+          const active = item === button;
+          item.classList.toggle('active', active);
+          item.setAttribute('aria-selected', String(active));
+        });
+        loadChart(button.dataset.country);
+      });
     });
 
     $$('.filter-tabs button').forEach((button, index) => {
@@ -144,6 +186,10 @@
     els.audio.addEventListener('pause', () => {
       els.previewPlayer.classList.remove('playing');
       state.audioSync = false;
+      if (!state.lyricPlaying && els.playerOverlay.classList.contains('open') && !state.cinemaEnded) {
+        els.playerOverlay.classList.remove('playing');
+        els.playerOverlay.classList.add('paused');
+      }
       if (!els.audio.ended) els.syncState.innerHTML = '<i></i> ALINEACIÓN PAUSADA';
     });
     els.audio.addEventListener('ended', endAudioSync);
@@ -172,6 +218,7 @@
         $$('.control-pill').forEach(b => b.classList.remove('active'));
         button.classList.add('active');
         state.lyricMode = button.dataset.mode;
+        els.playerOverlay.classList.toggle('cinema-active', state.lyricMode === 'cinematic');
         els.lyricsContent.classList.toggle('full-mode', state.lyricMode === 'full');
         els.lyricsContent.classList.toggle('flow-mode', state.lyricMode === 'flow');
         els.lyricsContent.classList.toggle('cinematic-mode', state.lyricMode === 'cinematic');
@@ -181,13 +228,18 @@
     });
 
     document.addEventListener('keydown', event => {
+      if (!els.entryGate.hidden) {
+        if (event.key === 'Enter') enterApp();
+        return;
+      }
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         openSearch();
       }
       if (event.key === 'Escape') {
-        closeSearch();
-        closePlayer();
+        if (els.environmentPanel.classList.contains('open')) closeEnvironment();
+        else if (els.playerOverlay.classList.contains('open')) returnFromPlayer();
+        else closeSearch();
       }
       if (event.code === 'Space' && els.playerOverlay.classList.contains('open') && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
         event.preventDefault();
@@ -200,11 +252,137 @@
     });
   }
 
-  function openSearch() {
+  function initEntry() {
+    document.body.classList.add('entry-open');
+    els.entryGate.setAttribute('aria-hidden', 'false');
+  }
+
+  function enterApp() {
+    if (els.entryGate.classList.contains('leaving')) return;
+    els.entryGate.classList.add('leaving');
+    document.body.classList.add('entering-app');
+    setTimeout(() => {
+      els.entryGate.hidden = true;
+      els.entryGate.setAttribute('aria-hidden', 'true');
+      $('#appShell').inert = false;
+      $('#appShell').setAttribute('aria-hidden', 'false');
+      document.body.classList.remove('entry-open', 'entering-app');
+      document.body.classList.add('app-entered');
+      if (matchMedia('(pointer:fine)').matches) $('#homeSearchInput').focus({ preventScroll: true });
+    }, state.motion ? 1050 : 20);
+  }
+
+  function initDiscovery() {
+    const questions = [
+      '¿Qué quieres escuchar hoy?',
+      '¿A qué suena tu mood?',
+      '¿Qué canción te encuentra hoy?',
+      '¿Cómo se siente este momento?',
+      '¿Qué quieres convertir en una escena?',
+      '¿Qué letra necesitas ahora?',
+    ];
+    const seed = Math.abs(new Date().getDate() + performance.now() | 0);
+    $('#discoveryQuestion').textContent = questions[seed % questions.length];
+  }
+
+  function initBeatStage() {
+    els.beatStage.innerHTML = Array.from({ length: 36 }, (_, index) => `<i style="--i:${index};--beat:.12"></i>`).join('');
+  }
+
+  function openEnvironment() {
+    els.environmentPanel.classList.add('open');
+    els.environmentPanel.setAttribute('aria-hidden', 'false');
+    els.environmentBackdrop.classList.add('open');
+  }
+
+  function closeEnvironment() {
+    els.environmentPanel.classList.remove('open');
+    els.environmentPanel.setAttribute('aria-hidden', 'true');
+    els.environmentBackdrop.classList.remove('open');
+  }
+
+  function selectEnvironment(index) {
+    state.themeIndex = Math.max(0, Math.min(themes.length - 1, index));
+    localStorage.setItem('lyra:theme', String(state.themeIndex));
+    setTheme(themes[state.themeIndex]);
+    $$('.environment-presets [data-theme]').forEach(button => button.classList.toggle('active', Number(button.dataset.theme) === state.themeIndex));
+    setTimeout(closeEnvironment, 260);
+  }
+
+  async function loadChart(country) {
+    state.chartCountry = country;
+    els.chartList.innerHTML = '<div class="chart-loading"><i></i><span>Sintonizando el chart…</span></div>';
+    try {
+      if (!state.chartsData) {
+        const response = await fetch('./data/charts.json');
+        if (!response.ok) throw new Error(`Chart bundle failed ${response.status}`);
+        state.chartsData = await response.json();
+      }
+      const items = state.chartsData.charts?.[country] || [];
+      if (!items.length) throw new Error(`Chart unavailable for ${country}`);
+      renderChart(items);
+    } catch (error) {
+      console.error(error);
+      els.chartList.innerHTML = '<div class="chart-error"><strong>El chart está fuera del aire.</strong><span>La búsqueda sigue disponible.</span></div>';
+    }
+  }
+
+  function renderChart(items) {
+    els.chartList.innerHTML = '';
+    items.slice(0, 10).forEach((item, index) => {
+      const row = document.createElement('button');
+      row.className = 'chart-row';
+      row.innerHTML = `
+        <span class="chart-rank">${String(index + 1).padStart(2, '0')}</span>
+        <img src="${escapeAttr(upscaleArtwork(item.artworkUrl100, 300))}" alt="Portada de ${escapeAttr(item.name)}" loading="lazy">
+        <span class="chart-copy"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.artistName)}</small></span>
+        <span class="chart-genre">${escapeHtml(item.genres?.[0]?.name || 'Música')}</span>
+        <span class="chart-open">VER LETRA <b>↗</b></span>`;
+      row.addEventListener('click', () => openChartTrack(item, row));
+      els.chartList.appendChild(row);
+    });
+  }
+
+  async function openChartTrack(item, row) {
+    if (row.classList.contains('resolving')) return;
+    row.classList.add('resolving');
+    try {
+      const catalogCountry = state.chartCountry === 'global' ? 'us' : (state.chartCountry || 'mx');
+      const params = new URLSearchParams({ term: `${item.name} ${item.artistName}`, media: 'music', entity: 'song', limit: '10', country: catalogCountry.toUpperCase() });
+      const response = await fetch(`https://itunes.apple.com/search?${params}`);
+      if (!response.ok) throw new Error(`Catalog failed ${response.status}`);
+      const records = (await response.json()).results || [];
+      const wantedTitle = normalizeText(item.name);
+      const wantedArtist = normalizeText(item.artistName);
+      const best = records.sort((a, b) => {
+        const score = record => (normalizeText(record.trackName) === wantedTitle ? 8 : 0) + (normalizeText(record.artistName).includes(wantedArtist) ? 6 : 0);
+        return score(b) - score(a);
+      })[0];
+      const track = best ? normalizeAppleTrack(best) : {
+        id: item.id,
+        title: item.name,
+        artist: item.artistName,
+        album: item.name,
+        artworkUrl: item.artworkUrl100,
+        trackViewUrl: item.url,
+        genre: item.genres?.[0]?.name || '',
+        releaseDate: item.releaseDate || '',
+        previewUrl: '', durationMs: 0,
+      };
+      row.classList.remove('resolving');
+      selectTrack(track, row);
+    } catch (error) {
+      console.error(error);
+      showToast('No pude abrir esta entrada del chart.');
+      row.classList.remove('resolving');
+    }
+  }
+
+  function openSearch(focus = true) {
     els.searchOverlay.classList.add('open');
     els.searchOverlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => els.searchInput.focus(), 250);
+    if (focus) setTimeout(() => els.searchInput.focus(), 250);
   }
 
   function closeSearch() {
@@ -213,20 +391,50 @@
     if (!els.playerOverlay.classList.contains('open')) document.body.style.overflow = '';
   }
 
-  function openPlayer() {
+  function openPlayer(sourceElement = null) {
+    els.playerOverlay.classList.remove('closing', 'playing', 'paused', 'ended', 'background-ready', 'lyrics-ready');
+    els.playerOverlay.classList.add('phase-loading');
+    els.playerOverlay.classList.toggle('cinema-active', state.lyricMode === 'cinematic');
+    els.endCredits.setAttribute('aria-hidden', 'true');
     els.playerOverlay.classList.add('open');
     els.playerOverlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    if (sourceElement) animateTrackPortal(state.currentTrack, sourceElement);
   }
 
   function closePlayer() {
-    els.playerOverlay.classList.remove('open');
+    els.playerOverlay.classList.add('closing');
     els.playerOverlay.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    stopLyricPlayback();
+    stopLyricPlayback(false);
     els.audio.pause();
     state.audioSync = false;
     els.previewPlayer.classList.remove('playing');
+    setTheme(themes[state.themeIndex] || themes[0]);
+    setTimeout(() => {
+      els.playerOverlay.classList.remove('open', 'closing', 'playing', 'paused', 'ended', 'phase-loading', 'background-ready', 'lyrics-ready');
+      document.body.style.overflow = '';
+    }, state.motion ? 520 : 0);
+  }
+
+  function returnFromPlayer() {
+    if (!els.playerOverlay.classList.contains('open')) return;
+    const hasResults = state.returnToResults && state.results.length > 0;
+    closePlayer();
+    setTimeout(() => {
+      if (hasResults) openSearch(false);
+      else switchView(state.currentView || 'discover');
+    }, state.motion ? 540 : 10);
+  }
+
+  function animateTrackPortal(track, sourceElement) {
+    const rect = sourceElement.getBoundingClientRect();
+    const portal = document.createElement('div');
+    portal.className = 'track-portal';
+    portal.style.cssText = `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px`;
+    portal.innerHTML = `<img src="${escapeAttr(upscaleArtwork(track.artworkUrl, 600))}" alt=""><span><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artist)}</small></span>`;
+    document.body.appendChild(portal);
+    requestAnimationFrame(() => portal.classList.add('traveling'));
+    setTimeout(() => portal.remove(), state.motion ? 880 : 0);
   }
 
   function runSearch(query) {
@@ -305,13 +513,13 @@
           <span>${escapeHtml(track.artist)}</span>
           <small>${escapeHtml(track.album || 'Álbum desconocido')}</small>
         </span>`;
-      card.addEventListener('click', () => selectTrack(track));
+      card.addEventListener('click', () => selectTrack(track, card));
       els.resultsGrid.appendChild(card);
     });
     initTilt(els.resultsGrid);
   }
 
-  async function selectTrack(track) {
+  async function selectTrack(track, sourceElement = null) {
     state.lyricsController?.abort();
     state.lyricsController = new AbortController();
     const controller = state.lyricsController;
@@ -324,11 +532,21 @@
     state.activeLyricIndex = -1;
     state.audioSync = false;
     state.syncAnchor = 0;
+    state.returnToResults = els.searchOverlay.classList.contains('open');
+    state.backgroundReady = false;
+    state.lyricsReady = false;
+    state.cinemaEnded = false;
     updateFavoriteButton();
     renderTrackMeta(track);
-    applyTrackTheme(track);
+    applyTrackTheme(track).finally(() => {
+      if (state.currentTrack !== track) return;
+      state.backgroundReady = true;
+      els.playerOverlay.classList.add('background-ready');
+      els.cinemaLoaderText.textContent = 'La escena encontró su luz';
+      revealCinemaWhenReady();
+    });
     closeSearch();
-    openPlayer();
+    openPlayer(sourceElement);
     els.lyricsLoading.hidden = false;
     $('.lyrics-loading p').textContent = 'Escuchando las palabras…';
     clearTimeout(state.lyricsMessageTimer);
@@ -339,6 +557,7 @@
     }, 6500);
     els.lyricsContent.innerHTML = '';
     $('#lyricsBadge').innerHTML = '<i></i> BUSCANDO LETRAS';
+    els.cinemaLoaderText.textContent = 'Preparando la escena…';
 
     addToHistory(track);
 
@@ -399,6 +618,8 @@
       $('#lyricsKicker').textContent = 'SIN LETRA · MODO AMBIENTE';
       $('#lyricsHeading').textContent = 'La portada todavía puede contar una historia.';
       renderLyrics();
+      state.lyricsReady = true;
+      revealCinemaWhenReady();
       return;
     }
 
@@ -414,6 +635,18 @@
       30
     );
     renderLyrics();
+    state.lyricsReady = true;
+    revealCinemaWhenReady();
+  }
+
+  function revealCinemaWhenReady() {
+    if (!state.backgroundReady || !state.lyricsReady) return;
+    setTimeout(() => {
+      if (!els.playerOverlay.classList.contains('open')) return;
+      els.playerOverlay.classList.remove('phase-loading');
+      els.playerOverlay.classList.add('lyrics-ready', 'paused');
+      els.cinemaLoaderText.textContent = 'Escena lista';
+    }, state.motion ? 620 : 0);
   }
 
   async function directLyricsSearch(track, signal) {
@@ -453,6 +686,7 @@
     $('#playerYear').textContent = track.releaseDate ? String(track.releaseDate).slice(0, 4) : '—';
     $('#playerGenre').textContent = track.genre || 'Música';
     $('#playerDuration').textContent = track.durationMs ? formatTime(track.durationMs / 1000) : '—:—';
+    $('#endTrackTitle').textContent = `${track.title} · ${track.artist}`;
     const external = $('#externalLink');
     external.href = track.trackViewUrl || '#';
     external.hidden = !track.trackViewUrl || track.trackViewUrl === '#';
@@ -561,7 +795,7 @@
     }
 
     const active = state.lyricElements[activeIndex];
-    if (active && (forceScroll || state.lyricPlaying || state.audioSync) && state.lyricMode !== 'full') {
+    if (active && (forceScroll || state.lyricPlaying || state.audioSync) && state.lyricMode === 'flow') {
       const target = active.offsetTop - els.lyricsViewport.clientHeight / 2 + active.offsetHeight / 2;
       els.lyricsViewport.scrollTo({ top: Math.max(0, target), behavior: state.motion ? 'smooth' : 'auto' });
     }
@@ -570,12 +804,14 @@
     els.lyricScrubber.value = String(progress);
     els.lyricScrubber.style.setProperty('--progress', `${progress}%`);
     els.lyricTime.textContent = formatTime(state.lyricTime);
+    updateBeatVisual(state.lyricTime);
 
-    if (state.lyricTime >= state.lyricDuration && state.lyricPlaying) stopLyricPlayback();
+    if (state.lyricTime >= state.lyricDuration && state.lyricPlaying) finishCinema();
   }
 
   function toggleLyricPlayback() {
-    state.lyricPlaying ? stopLyricPlayback() : startLyricPlayback();
+    if (state.cinemaEnded) return replayExperience();
+    state.lyricPlaying ? stopLyricPlayback(true) : startLyricPlayback();
   }
 
   function startLyricPlayback() {
@@ -584,6 +820,10 @@
     if (state.lyricTime >= state.lyricDuration) state.lyricTime = 0;
     state.lyricPlaying = true;
     state.audioSync = false;
+    state.cinemaEnded = false;
+    els.playerOverlay.classList.remove('paused', 'ended', 'phase-loading');
+    els.playerOverlay.classList.add('playing');
+    els.endCredits.setAttribute('aria-hidden', 'true');
     els.syncState.innerHTML = '<i></i> PULSO VISUAL';
     els.lyricTimeline.classList.add('playing');
     let previous = performance.now();
@@ -597,11 +837,74 @@
     state.lyricTimer = requestAnimationFrame(tick);
   }
 
-  function stopLyricPlayback() {
+  function stopLyricPlayback(presentPause = true) {
     state.lyricPlaying = false;
     els.lyricTimeline.classList.remove('playing');
     if (state.lyricTimer) cancelAnimationFrame(state.lyricTimer);
     state.lyricTimer = null;
+    if (presentPause && els.playerOverlay.classList.contains('open') && !state.cinemaEnded) {
+      els.playerOverlay.classList.remove('playing');
+      els.playerOverlay.classList.add('paused');
+    }
+  }
+
+  function finishCinema() {
+    stopLyricPlayback(false);
+    state.cinemaEnded = true;
+    state.lyricTime = state.lyricDuration;
+    els.playerOverlay.classList.remove('playing', 'paused');
+    els.playerOverlay.classList.add('ended');
+    els.endCredits.setAttribute('aria-hidden', 'false');
+    setTheme(themes[state.themeIndex] || themes[0]);
+    updateLyricUI(false);
+  }
+
+  function replayExperience() {
+    state.cinemaEnded = false;
+    state.lyricTime = 0;
+    state.activeLyricIndex = -1;
+    els.playerOverlay.classList.remove('ended');
+    els.playerOverlay.classList.add('paused');
+    els.endCredits.setAttribute('aria-hidden', 'true');
+    applyTrackTheme(state.currentTrack);
+    updateLyricUI(true);
+    setTimeout(startLyricPlayback, state.motion ? 420 : 0);
+  }
+
+  function updateBeatVisual(time) {
+    if (!els.beatStage || (!state.lyricPlaying && els.audio.paused)) return;
+    if (state.audioAnalyser && state.audioData && !els.audio.paused) state.audioAnalyser.getByteFrequencyData(state.audioData);
+    const audioEnergy = els.audio.paused ? 0 : .18 + Math.abs(Math.sin(els.audio.currentTime * 5.6)) * .58;
+    $$('#beatStage i').forEach((bar, index) => {
+      const wave = Math.abs(Math.sin(time * (2.1 + index % 5 * .13) + index * .72));
+      const kick = Math.pow(Math.max(0, Math.sin(time * 3.25 - index * .08)), 6);
+      const liveBin = state.audioData?.length ? state.audioData[Math.floor(index / 36 * state.audioData.length)] / 255 : 0;
+      const energy = Math.min(1, .08 + wave * .24 + kick * .62 + audioEnergy * .2 + liveBin * .72);
+      bar.style.setProperty('--beat', energy.toFixed(3));
+    });
+  }
+
+  async function ensureAudioAnalyser() {
+    try {
+      if (state.audioContext) {
+        if (state.audioContext.state === 'suspended') await state.audioContext.resume();
+        return;
+      }
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      state.audioContext = new AudioContextClass();
+      const source = state.audioContext.createMediaElementSource(els.audio);
+      state.audioAnalyser = state.audioContext.createAnalyser();
+      state.audioAnalyser.fftSize = 128;
+      state.audioAnalyser.smoothingTimeConstant = .76;
+      state.audioData = new Uint8Array(state.audioAnalyser.frequencyBinCount);
+      source.connect(state.audioAnalyser);
+      state.audioAnalyser.connect(state.audioContext.destination);
+    } catch {
+      state.audioContext = null;
+      state.audioAnalyser = null;
+      state.audioData = null;
+    }
   }
 
   function togglePreview() {
@@ -629,7 +932,10 @@
   }
 
   function beginAudioSync() {
+    ensureAudioAnalyser();
     state.audioSync = true;
+    els.playerOverlay.classList.remove('paused');
+    els.playerOverlay.classList.add('playing');
     state.syncAnchor = state.lyricTime - els.audio.currentTime;
     els.previewPlayer.classList.add('playing');
     els.syncState.innerHTML = '<i></i> FRAGMENTO EN VIVO';
@@ -638,6 +944,10 @@
   function endAudioSync() {
     state.audioSync = false;
     els.previewPlayer.classList.remove('playing');
+    if (!state.lyricPlaying && !state.cinemaEnded) {
+      els.playerOverlay.classList.remove('playing');
+      els.playerOverlay.classList.add('paused');
+    }
     els.syncState.innerHTML = '<i></i> PULSO VISUAL';
     els.previewLabel.textContent = 'FRAGMENTO · TOCA UNA LÍNEA PARA ALINEAR';
   }
@@ -647,10 +957,13 @@
     setPlayerPalette(fallback, track.artworkUrl);
     const image = $('#playerArtwork');
     try {
-      if (!image.complete) await new Promise((resolve, reject) => {
-        image.addEventListener('load', resolve, { once: true });
-        image.addEventListener('error', reject, { once: true });
-      });
+      if (!image.complete) await Promise.race([
+        new Promise((resolve, reject) => {
+          image.addEventListener('load', resolve, { once: true });
+          image.addEventListener('error', reject, { once: true });
+        }),
+        new Promise(resolve => setTimeout(resolve, 3800)),
+      ]);
       const palette = extractArtworkPalette(image);
       if (state.currentTrack === track && palette) setPlayerPalette(palette, track.artworkUrl);
     } catch {
@@ -752,11 +1065,14 @@
     document.documentElement.style.setProperty('--accent-2', theme[1]);
     document.documentElement.style.setProperty('--accent-3', theme[2]);
     document.documentElement.style.setProperty('--lime', theme[3]);
-    $('#moodLabel').textContent = theme[4];
+    $('meta[name="theme-color"]')?.setAttribute('content', theme[1]);
+    if ($('#moodLabel')) $('#moodLabel').textContent = theme[4];
+    $$('.environment-presets [data-theme]').forEach(button => button.classList.toggle('active', Number(button.dataset.theme) === state.themeIndex));
   }
 
   function cycleTheme() {
     state.themeIndex = (state.themeIndex + 1) % themes.length;
+    localStorage.setItem('lyra:theme', String(state.themeIndex));
     setTheme(themes[state.themeIndex]);
     $('#moodOrb').animate([{ transform: 'scale(.88) rotate(-10deg)' }, { transform: 'scale(1.08) rotate(6deg)' }, { transform: 'scale(1)' }], { duration: 650, easing: 'cubic-bezier(.2,.8,.2,1)' });
   }
@@ -894,7 +1210,7 @@
         <div class="library-card-copy"><strong>${escapeHtml(track.title)}</strong><span>${escapeHtml(track.artist)}</span></div>`;
       card.addEventListener('click', event => {
         if (event.target.closest('button')) return;
-        selectTrack(track);
+        selectTrack(track, card);
       });
       const remove = $('button', card);
       if (remove) remove.addEventListener('click', () => {
@@ -952,6 +1268,10 @@
       genre: item.primaryGenreName || '',
       releaseDate: item.releaseDate || '',
     };
+  }
+
+  function normalizeText(value) {
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
   }
 
   function pickBestLyrics(records, track) {

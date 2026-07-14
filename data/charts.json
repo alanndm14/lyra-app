@@ -1,0 +1,1300 @@
+{
+  "updatedAt": "2026-07-14T03:16:05.301Z",
+  "charts": {
+    "mx": [
+      {
+        "id": "1804142885",
+        "name": "TU SANCHO",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/tu-sancho/1804142476?i=1804142885",
+        "releaseDate": "2025-05-02",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1712363845",
+        "name": "EXCESOS",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/21/e3/b7/21e3b74f-571b-07ce-567b-a2aa8274c7b2/196871548922.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/excesos/1712362875?i=1712363845",
+        "releaseDate": "2023-10-20",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1804142886",
+        "name": "Marlboro Rojo",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/marlboro-rojo/1804142476?i=1804142886",
+        "releaseDate": "2025-05-02",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1570323056",
+        "name": "Yonaguni",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b6/12/da/b612daba-6c68-c2ab-7492-fb2e079074d5/196006829308.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/yonaguni/1570323047?i=1570323056",
+        "releaseDate": "2021-06-04",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1783250950",
+        "name": "gervonta",
+        "artistName": "Peso Pluma",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/39/ed/a6/39eda6fa-33fc-76da-238e-454c5ad8b73c/199066114025.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/gervonta/1783250949?i=1783250950",
+        "releaseDate": "2024-12-05",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1804142884",
+        "name": "ANSIEDAD",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/ansiedad/1804142476?i=1804142884",
+        "releaseDate": "2025-05-02",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1748016028",
+        "name": "HOLLYWOOD",
+        "artistName": "Peso Pluma & Estevan Plazola",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/e9/65/3de9651e-fe11-0525-7eee-762861af1152/198391808319.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/hollywood/1748015447?i=1748016028",
+        "releaseDate": "2024-06-20",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1622045954",
+        "name": "Efecto",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3e/04/eb/3e04ebf6-370f-f59d-ec84-2c2643db92f1/196626945068.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/efecto/1622045624?i=1622045954",
+        "releaseDate": "2022-05-06",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1887113850",
+        "name": "Nalguita y Teta",
+        "artistName": "Neton Vega",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/3d/94/07/3d94072e-4694-fdc5-2b3d-2b81f2f95b64/1963624427341_cover.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/nalguita-y-teta/1887113849?i=1887113850",
+        "releaseDate": "2026-03-27",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1861943162",
+        "name": "daño",
+        "artistName": "Peso Pluma & Tito Double P",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e3/47/a9/e347a9c6-1cf0-6154-3976-b9dd615e2a83/199806514993.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/da%C3%B1o/1861942827?i=1861943162",
+        "releaseDate": "2025-12-25",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      }
+    ],
+    "jp": [
+      {
+        "id": "6788211810",
+        "name": "Brand New",
+        "artistName": "Mrs. GREEN APPLE",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/41/a0/b6/41a0b6b9-a720-25e5-fc69-7e9c3ca1296e/26UMGIM73217.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/brand-new/6788211807?i=6788211810",
+        "genres": [
+          {
+            "name": "ロック"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "1739088799",
+        "name": "ライラック",
+        "artistName": "Mrs. GREEN APPLE",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4c/3b/b2/4c3bb247-3be8-0c57-aa9a-7f1775a7b7a8/24UMGIM32931.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/%E3%83%A9%E3%82%A4%E3%83%A9%E3%83%83%E3%82%AF/1739088465?i=1739088799",
+        "releaseDate": "2024-04-12",
+        "genres": [
+          {
+            "name": "ロック"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "1846753946",
+        "name": "好きすぎて滅!",
+        "artistName": "M!LK",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d4/f9/1b/d4f91bfd-6176-4733-113f-b72f6095d5df/VEATP-44481.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/%E5%A5%BD%E3%81%8D%E3%81%99%E3%81%8E%E3%81%A6%E6%BB%85/1846753945?i=1846753946",
+        "releaseDate": "2025-10-27",
+        "genres": [
+          {
+            "name": "J-Pop"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "1837658529",
+        "name": "IRIS OUT",
+        "artistName": "米津玄師",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e0/f9/f1/e0f9f1f3-a088-b28d-6760-a28accabc705/4547366775181.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/iris-out/1837658528?i=1837658529",
+        "releaseDate": "2025-09-15",
+        "genres": [
+          {
+            "name": "J-Pop"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "1869537742",
+        "name": "爆裂愛してる",
+        "artistName": "M!LK",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/45/b1/53/45b153d5-e943-6cd9-620e-0a4c66b7525b/VEATP-45199.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/%E7%88%86%E8%A3%82%E6%84%9B%E3%81%97%E3%81%A6%E3%82%8B/1869537741?i=1869537742",
+        "releaseDate": "2026-02-18",
+        "genres": [
+          {
+            "name": "J-Pop"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "6774039202",
+        "name": "烏 - Raven",
+        "artistName": "米津玄師",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/66/89/10/668910f4-2f09-12c7-200a-104eee77cb48/4547366827767.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/%E7%83%8F-raven/6774039193?i=6774039202",
+        "releaseDate": "2026-06-15",
+        "genres": [
+          {
+            "name": "J-Pop"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "1894837345",
+        "name": "It's Me",
+        "artistName": "ILLIT",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/cc/76/26/cc76262a-dc2e-0746-ed85-070a56d23d40/26UMGIM46377.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/its-me/1894837142?i=1894837345",
+        "releaseDate": "2026-04-30",
+        "genres": [
+          {
+            "name": "ポップ"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "604748203",
+        "name": "夜の踊り子",
+        "artistName": "サカナクション",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/60/9b/bb/609bbb5d-96eb-ae16-f08a-81a3223deb24/VICL-63999.jpg/100x99bb.jpg",
+        "url": "https://music.apple.com/jp/album/%E5%A4%9C%E3%81%AE%E8%B8%8A%E3%82%8A%E5%AD%90/604748196?i=604748203",
+        "releaseDate": "2013-03-13",
+        "genres": [
+          {
+            "name": "ロック"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "1408505264",
+        "name": "青と夏",
+        "artistName": "Mrs. GREEN APPLE",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/34/27/08/3427087f-2d39-4847-9b19-052dd3589014/18UMGIM36633.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/%E9%9D%92%E3%81%A8%E5%A4%8F/1408505088?i=1408505264",
+        "releaseDate": "2018-07-12",
+        "genres": [
+          {
+            "name": "ロック"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      },
+      {
+        "id": "1451570480",
+        "name": "花束",
+        "artistName": "back number",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/26/b6/e7/26b6e7e2-1cbb-4dde-edfb-e44e1f881cbd/00602577303739.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/jp/album/%E8%8A%B1%E6%9D%9F/1451570468?i=1451570480",
+        "releaseDate": "2011-06-22",
+        "genres": [
+          {
+            "name": "J-Pop"
+          },
+          {
+            "name": "ミュージック"
+          }
+        ]
+      }
+    ],
+    "us": [
+      {
+        "id": "1844932150",
+        "name": "Choosin' Texas",
+        "artistName": "Ella Langley",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/91/4d/e2914d0a-7f1d-f04c-fbf4-c50b38548838/196873638690.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/choosin-texas/1844932149?i=1844932150",
+        "releaseDate": "2025-10-17",
+        "genres": [
+          {
+            "name": "Country"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6769568596",
+        "name": "Janice STFU",
+        "artistName": "Drake",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/35/b9/06/35b90629-a873-14f8-4789-ffc324960038/26UMGIM63614.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/janice-stfu/6769568449?i=6769568596",
+        "releaseDate": "2026-05-15",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6784327277",
+        "name": "California Girls",
+        "artistName": "Future",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8e/a0/75/8ea0757a-6859-9c50-e92b-944979cc0d53/196874557198.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/california-girls/6784327271?i=6784327277",
+        "releaseDate": "2026-07-08",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6784327272",
+        "name": "F**k A Interview",
+        "artistName": "Future",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8e/a0/75/8ea0757a-6859-9c50-e92b-944979cc0d53/196874557198.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/f-k-a-interview/6784327271?i=6784327272",
+        "releaseDate": "2026-07-08",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6784327292",
+        "name": "Konnichiwa",
+        "artistName": "Future",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8e/a0/75/8ea0757a-6859-9c50-e92b-944979cc0d53/196874557198.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/konnichiwa/6784327271?i=6784327292",
+        "releaseDate": "2026-07-08",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6784327274",
+        "name": "One Two",
+        "artistName": "Future",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8e/a0/75/8ea0757a-6859-9c50-e92b-944979cc0d53/196874557198.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/one-two/6784327271?i=6784327274",
+        "releaseDate": "2026-07-08",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6784327294",
+        "name": "Snow in Skyami",
+        "artistName": "Future",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8e/a0/75/8ea0757a-6859-9c50-e92b-944979cc0d53/196874557198.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/snow-in-skyami/6784327271?i=6784327294",
+        "releaseDate": "2026-07-08",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6784327286",
+        "name": "Tank Top Pluto",
+        "artistName": "Future",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8e/a0/75/8ea0757a-6859-9c50-e92b-944979cc0d53/196874557198.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/tank-top-pluto/6784327271?i=6784327286",
+        "releaseDate": "2026-07-08",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6784327509",
+        "name": "Radio",
+        "artistName": "Future",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8e/a0/75/8ea0757a-6859-9c50-e92b-944979cc0d53/196874557198.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/radio/6784327271?i=6784327509",
+        "releaseDate": "2026-06-26",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6784327291",
+        "name": "Weight Up",
+        "artistName": "Future",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8e/a0/75/8ea0757a-6859-9c50-e92b-944979cc0d53/196874557198.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/weight-up/6784327271?i=6784327291",
+        "releaseDate": "2026-07-08",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      }
+    ],
+    "es": [
+      {
+        "id": "1894272112",
+        "name": "LA GRACIOSA",
+        "artistName": "Quevedo & Elvis Crespo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/56/e5/bf/56e5bfea-2071-1224-1c62-f6119195a949/8718521173821.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/la-graciosa/1894271358?i=1894272112",
+        "releaseDate": "2026-04-23",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1894271858",
+        "name": "AL GOLPITO",
+        "artistName": "Quevedo & Nueva Línea",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/56/e5/bf/56e5bfea-2071-1224-1c62-f6119195a949/8718521173821.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/al-golpito/1894271358?i=1894271858",
+        "releaseDate": "2026-04-23",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1814146675",
+        "name": "SUPERESTRELLA",
+        "artistName": "Aitana",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/43/08/06/430806b8-3b40-649f-37e9-37ff2ab702df/25UMGIM52016.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/superestrella/1814146266?i=1814146675",
+        "releaseDate": "2025-05-29",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "6768469976",
+        "name": "Dai Dai",
+        "artistName": "Shakira & Burna Boy",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/dai-dai/6768469975?i=6768469976",
+        "releaseDate": "2026-05-14",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "6770655342",
+        "name": "De Lejitos (Remix)",
+        "artistName": "Jay Wheeler & Omar Courtz",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/71/98/7a/71987aa4-557e-61fd-66c8-a5536d21d31c/ticket.snrwquok.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/de-lejitos-remix/6770654729?i=6770655342",
+        "releaseDate": "2026-05-28",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "6774634329",
+        "name": "pa ti toa <3",
+        "artistName": "Ana Mena & Lola Indigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/9e/fa/6f/9efa6fe0-5ce8-3f55-7ed6-24cda7d77505/196874447369.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/pa-ti-toa-3/6774634328?i=6774634329",
+        "releaseDate": "2026-06-12",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1877482633",
+        "name": "KOKO",
+        "artistName": "Omar Courtz",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0b/13/d6/0b13d6d1-d5b9-03f4-a7b8-29f00faad00f/820200317964.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/koko/1877481995?i=1877482633",
+        "releaseDate": "2026-02-19",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1570323056",
+        "name": "Yonaguni",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b6/12/da/b612daba-6c68-c2ab-7492-fb2e079074d5/196006829308.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/yonaguni/1570323047?i=1570323056",
+        "releaseDate": "2021-06-04",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1542103215",
+        "name": "LA NOCHE DE ANOCHE",
+        "artistName": "Bad Bunny & ROSALÍA",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/64/70/1c/64701cff-71ed-912f-ce62-71d409f5e6ad/195497640560.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/la-noche-de-anoche/1542102907?i=1542103215",
+        "releaseDate": "2020-11-27",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1848960624",
+        "name": "Dardos",
+        "artistName": "Romeo Santos & Prince Royce",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/60/66/a9/6066a9a2-b1e8-d171-d8b3-7d044c040b94/196873751887.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/dardos/1848960616?i=1848960624",
+        "releaseDate": "2025-11-27",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      }
+    ],
+    "co": [
+      {
+        "id": "1710983279",
+        "name": "PERRO NEGRO",
+        "artistName": "Bad Bunny & Feid",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/00/e0/31/00e0311e-9dab-fd0c-fc37-ee3d36aafbf3/197190137897.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/perro-negro/1710982865?i=1710983279",
+        "releaseDate": "2023-10-13",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1570323056",
+        "name": "Yonaguni",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b6/12/da/b612daba-6c68-c2ab-7492-fb2e079074d5/196006829308.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/yonaguni/1570323047?i=1570323056",
+        "releaseDate": "2021-06-04",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "6779825388",
+        "name": "MERO TOTE",
+        "artistName": "Blessd, De La Rose & Los Money Makers",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/33/a1/e5/33a1e588-73c9-9bf1-54eb-91275332dde2/1200214359645.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/mero-tote/6779825180?i=6779825388",
+        "releaseDate": "2026-06-18",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1865959223",
+        "name": "Dichavate",
+        "artistName": "Ya Ice Dilan, Rey Tony, Dj Honda & Helabusador",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a6/ea/be/a6eabeb7-b493-8920-2fcc-5209f43f335d/8605020139741.png/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/dichavate/1865959222?i=1865959223",
+        "releaseDate": "2025-12-24",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1814164314",
+        "name": "Ojalá",
+        "artistName": "Ryan Castro",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8b/bb/06/8bbb0602-9d85-c28b-6de1-558f89f38bfa/196873157443.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/ojal%C3%A1/1814163356?i=1814164314",
+        "releaseDate": "2025-05-08",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1622045954",
+        "name": "Efecto",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3e/04/eb/3e04ebf6-370f-f59d-ec84-2c2643db92f1/196626945068.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/efecto/1622045624?i=1622045954",
+        "releaseDate": "2022-05-06",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1877482633",
+        "name": "KOKO",
+        "artistName": "Omar Courtz",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0b/13/d6/0b13d6d1-d5b9-03f4-a7b8-29f00faad00f/820200317964.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/koko/1877481995?i=1877482633",
+        "releaseDate": "2026-02-19",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1470146813",
+        "name": "LA CANCIÓN",
+        "artistName": "J Balvin & Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/77/32/74/7732746d-25e5-baae-b921-bad4a07d87b1/19UMGIM55524.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/la-canci%C3%B3n/1470146332?i=1470146813",
+        "releaseDate": "2019-08-02",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "6789281258",
+        "name": "A Xon De Que",
+        "artistName": "Feid",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e7/91/0c/e7910c76-ba72-6e2e-928c-e241d408b204/26UMGIM87502.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/a-xon-de-que/6789281255?i=6789281258",
+        "releaseDate": "2026-07-10",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1882479567",
+        "name": "Pico Y Chao (W Sound 08)",
+        "artistName": "W Sound, Kris R. & Ovy On the Drums",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ac/e6/e8/ace6e85b-3fcc-39f1-34ab-3c153810a859/5026854835235.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/co/album/pico-y-chao-w-sound-08/1882479566?i=1882479567",
+        "releaseDate": "2026-03-05",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      }
+    ],
+    "ar": [
+      {
+        "id": "895127012",
+        "name": "Wonderwall (Remastered)",
+        "artistName": "Oasis",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e2/e4/9b/e2e49bdf-c92c-2ff9-c7bd-7e651f2aa6b3/886444642743.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/wonderwall-remastered/895127002?i=895127012",
+        "releaseDate": "1995-10-02",
+        "genres": [
+          {
+            "name": "Alternativa"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1877482633",
+        "name": "KOKO",
+        "artistName": "Omar Courtz",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0b/13/d6/0b13d6d1-d5b9-03f4-a7b8-29f00faad00f/820200317964.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/koko/1877481995?i=1877482633",
+        "releaseDate": "2026-02-19",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1894271858",
+        "name": "AL GOLPITO",
+        "artistName": "Quevedo & Nueva Línea",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/56/e5/bf/56e5bfea-2071-1224-1c62-f6119195a949/8718521173821.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/al-golpito/1894271358?i=1894271858",
+        "releaseDate": "2026-04-23",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1889992115",
+        "name": "stupid song",
+        "artistName": "Olivia Rodrigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/stupid-song/1889992111?i=1889992115",
+        "releaseDate": "2026-06-12",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "6770655342",
+        "name": "De Lejitos (Remix)",
+        "artistName": "Jay Wheeler & Omar Courtz",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/71/98/7a/71987aa4-557e-61fd-66c8-a5536d21d31c/ticket.snrwquok.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/de-lejitos-remix/6770654729?i=6770655342",
+        "releaseDate": "2026-05-28",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1892545229",
+        "name": "Danceteria",
+        "artistName": "Madonna",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/eb/8f/5d/eb8f5dcf-aec1-1f58-fbea-dc0bb086f1c8/093624819837.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/danceteria/1892545087?i=1892545229",
+        "releaseDate": "2026-07-03",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1662168786",
+        "name": "MIA (feat. Drake)",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/09/aa/f8/09aaf8da-8eaf-bf60-0c23-48a88d546cbd/26991.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/mia-feat-drake/1662168785?i=1662168786",
+        "releaseDate": "2018-10-11",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1622045962",
+        "name": "Ojitos Lindos",
+        "artistName": "Bad Bunny & Bomba Estéreo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3e/04/eb/3e04ebf6-370f-f59d-ec84-2c2643db92f1/196626945068.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/ojitos-lindos/1622045624?i=1622045962",
+        "releaseDate": "2022-05-06",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1889992123",
+        "name": "the cure",
+        "artistName": "Olivia Rodrigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/the-cure/1889992111?i=1889992123",
+        "releaseDate": "2026-05-22",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1892545227",
+        "name": "Bring Your Love",
+        "artistName": "Madonna & Sabrina Carpenter",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/eb/8f/5d/eb8f5dcf-aec1-1f58-fbea-dc0bb086f1c8/093624819837.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/bring-your-love/1892545087?i=1892545227",
+        "releaseDate": "2026-04-30",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      }
+    ],
+    "gb": [
+      {
+        "id": "1817609509",
+        "name": "Man I Need",
+        "artistName": "Olivia Dean",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/man-i-need/1817609404?i=1817609509",
+        "releaseDate": "2025-09-26",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "1820918468",
+        "name": "Rein Me In",
+        "artistName": "Sam Fender & Olivia Dean",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8f/0f/9f/8f0f9f3d-b26b-779d-d1f1-2db2154a68b7/25UMGIM75096.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/rein-me-in/1820918466?i=1820918468",
+        "releaseDate": "2025-10-17",
+        "genres": [
+          {
+            "name": "Alternative"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "1525933490",
+        "name": "Wonderwall (Remastered)",
+        "artistName": "Oasis",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/34/2e/cb/342ecb17-ef19-816a-4ce5-e60b9ceec161/5051961073164.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/wonderwall-remastered/1525933483?i=1525933490",
+        "releaseDate": "1995-10-02",
+        "genres": [
+          {
+            "name": "Music"
+          },
+          {
+            "name": "Alternative"
+          }
+        ]
+      },
+      {
+        "id": "1870514330",
+        "name": "Talk To You (feat. 54 Ultra)",
+        "artistName": "ANOTR",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/6a/77/f9/6a77f93a-9286-60d8-3a0b-7d01a4b222cf/5665.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/talk-to-you-feat-54-ultra/1870514329?i=1870514330",
+        "releaseDate": "2026-03-06",
+        "genres": [
+          {
+            "name": "Dance"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6769070199",
+        "name": "Movin' To The Sun",
+        "artistName": "HUGEL, Imael Angel & Ultra Naté",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/96/61/7a/96617ab5-51da-7cfc-97e5-c5a6a893c210/1087654.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/movin-to-the-sun/6769069923?i=6769070199",
+        "releaseDate": "2026-05-22",
+        "genres": [
+          {
+            "name": "Electronic"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "1844932150",
+        "name": "Choosin' Texas",
+        "artistName": "Ella Langley",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/91/4d/e2914d0a-7f1d-f04c-fbf4-c50b38548838/196873638690.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/choosin-texas/1844932149?i=1844932150",
+        "releaseDate": "2025-10-17",
+        "genres": [
+          {
+            "name": "Country"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "1889992115",
+        "name": "stupid song",
+        "artistName": "Olivia Rodrigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/stupid-song/1889992111?i=1889992115",
+        "releaseDate": "2026-06-12",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "1884097804",
+        "name": "Free Your Mind",
+        "artistName": "Prospa & Cloonee",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/15/eb/a6/15eba69b-6089-53a7-3106-5c7dfac97677/820200577436.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/free-your-mind/1884097801?i=1884097804",
+        "releaseDate": "2026-03-27",
+        "genres": [
+          {
+            "name": "Dance"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "1889992123",
+        "name": "the cure",
+        "artistName": "Olivia Rodrigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/the-cure/1889992111?i=1889992123",
+        "releaseDate": "2026-05-22",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6769568596",
+        "name": "Janice STFU",
+        "artistName": "Drake",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/35/b9/06/35b90629-a873-14f8-4789-ffc324960038/26UMGIM63614.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/gb/album/janice-stfu/6769568449?i=6769568596",
+        "releaseDate": "2026-05-15",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      }
+    ],
+    "global": [
+      {
+        "id": "1570323056",
+        "name": "Yonaguni",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b6/12/da/b612daba-6c68-c2ab-7492-fb2e079074d5/196006829308.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/yonaguni/1570323047?i=1570323056",
+        "releaseDate": "2021-06-04",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1877482633",
+        "name": "KOKO",
+        "artistName": "Omar Courtz",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0b/13/d6/0b13d6d1-d5b9-03f4-a7b8-29f00faad00f/820200317964.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/koko/1877481995?i=1877482633",
+        "releaseDate": "2026-02-19",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1894271858",
+        "name": "AL GOLPITO",
+        "artistName": "Quevedo & Nueva Línea",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/56/e5/bf/56e5bfea-2071-1224-1c62-f6119195a949/8718521173821.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/al-golpito/1894271358?i=1894271858",
+        "releaseDate": "2026-04-23",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      },
+      {
+        "id": "1844932150",
+        "name": "Choosin' Texas",
+        "artistName": "Ella Langley",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/91/4d/e2914d0a-7f1d-f04c-fbf4-c50b38548838/196873638690.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/choosin-texas/1844932149?i=1844932150",
+        "releaseDate": "2025-10-17",
+        "genres": [
+          {
+            "name": "Country"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "6770655342",
+        "name": "De Lejitos (Remix)",
+        "artistName": "Jay Wheeler & Omar Courtz",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/71/98/7a/71987aa4-557e-61fd-66c8-a5536d21d31c/ticket.snrwquok.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/es/album/de-lejitos-remix/6770654729?i=6770655342",
+        "releaseDate": "2026-05-28",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1889992115",
+        "name": "stupid song",
+        "artistName": "Olivia Rodrigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/stupid-song/1889992111?i=1889992115",
+        "releaseDate": "2026-06-12",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "6769568596",
+        "name": "Janice STFU",
+        "artistName": "Drake",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/35/b9/06/35b90629-a873-14f8-4789-ffc324960038/26UMGIM63614.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/us/album/janice-stfu/6769568449?i=6769568596",
+        "releaseDate": "2026-05-15",
+        "genres": [
+          {
+            "name": "Hip-Hop/Rap"
+          },
+          {
+            "name": "Music"
+          }
+        ]
+      },
+      {
+        "id": "1622045954",
+        "name": "Efecto",
+        "artistName": "Bad Bunny",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/3e/04/eb/3e04ebf6-370f-f59d-ec84-2c2643db92f1/196626945068.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/efecto/1622045624?i=1622045954",
+        "releaseDate": "2022-05-06",
+        "genres": [
+          {
+            "name": "Música latina"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1889992123",
+        "name": "the cure",
+        "artistName": "Olivia Rodrigo",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/ar/album/the-cure/1889992111?i=1889992123",
+        "releaseDate": "2026-05-22",
+        "genres": [
+          {
+            "name": "Pop"
+          },
+          {
+            "name": "Música"
+          }
+        ]
+      },
+      {
+        "id": "1804142885",
+        "name": "TU SANCHO",
+        "artistName": "Fuerza Regida",
+        "artworkUrl100": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/51/0a/a3/510aa39f-7a41-b53c-70a0-6a0df60645bb/196872995978.jpg/100x100bb.jpg",
+        "url": "https://music.apple.com/mx/album/tu-sancho/1804142476?i=1804142885",
+        "releaseDate": "2025-05-02",
+        "genres": [
+          {
+            "name": "Música"
+          },
+          {
+            "name": "Música latina"
+          }
+        ]
+      }
+    ]
+  }
+}

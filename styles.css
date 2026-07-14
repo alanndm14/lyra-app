@@ -857,6 +857,10 @@ body.app-entered .app-shell { opacity:1; transform:none; }
 .youtube-timeline-toggle span { font:850 7px/1 "Manrope"; letter-spacing:.13em; }
 .youtube-timeline-toggle.playing { color:#fff; border-color:rgba(255,75,85,.5); background:linear-gradient(115deg,rgba(255,35,56,.85),rgba(126,20,34,.82)); box-shadow:0 0 22px rgba(255,35,56,.22); }
 .youtube-timeline-toggle.playing svg { fill:#fff; }
+.youtube-timeline-toggle.searching { color:#aaa6b5; border-color:rgba(255,255,255,.1); }
+.youtube-timeline-toggle.searching svg { animation:youtube-pulse 1.15s ease-in-out infinite; }
+.youtube-timeline-toggle.error { color:#ffd2d5; border-color:rgba(255,75,85,.36); background:rgba(111,19,31,.26); }
+@keyframes youtube-pulse { 50% { opacity:.3; transform:scale(.82); } }
 .lyric-translation { display:block; width:100%; margin-top:.55em; color:color-mix(in srgb,var(--lyric-soft) 48%,#fff); font:650 .25em/1.25 "Manrope"; letter-spacing:-.015em; text-wrap:balance; text-shadow:0 0 20px color-mix(in srgb,var(--lyric-hot) 22%,transparent); }
 .lyric-translation[hidden] { display:none!important; }
 
@@ -1001,3 +1005,26 @@ body.app-entered .app-shell { opacity:1; transform:none; }
   .player-overlay.cinema-active.has-youtube .cinematic-mode .lyric-line { left:70%; top:50%; max-width:55vw; font-size:calc(clamp(26px,6vw,48px) * var(--font-scale)); }
   .player-overlay.cinema-active.has-youtube .lyric-timeline { left:70%; width:55vw; }
 }
+
+/* Perfil adaptativo para escritorios con lienzos grandes o GPU limitada. */
+body.performance-lite #particleCanvas { display:none; }
+body.performance-lite .player-stage::before { filter:saturate(112%) brightness(.62); transform:scale(1.035); opacity:.56; }
+body.performance-lite .player-ambient { animation:none!important; filter:none; opacity:.2; mix-blend-mode:normal; transform:none!important; }
+body.performance-lite .search-backdrop,
+body.performance-lite .player-backdrop,
+body.performance-lite .environment-backdrop,
+body.performance-lite .home-search,
+body.performance-lite .player-close,
+body.performance-lite .track-panel,
+body.performance-lite .player-overlay.cinema-active .lyric-timeline { -webkit-backdrop-filter:none!important; backdrop-filter:none!important; }
+body.performance-lite .entry-gate.leaving .entry-card,
+body.performance-lite .track-portal.traveling,
+body.performance-lite .player-overlay.cinema-active.closing .player-stage { filter:none; }
+body.performance-lite .lyric-line { will-change:auto; }
+body.performance-lite .player-overlay.cinema-active .cinematic-mode .lyric-line { filter:none; transition:opacity .24s,transform .38s cubic-bezier(.2,.8,.2,1); }
+body.performance-lite .lyric-token { transition:transform .14s,opacity .14s; }
+body.performance-lite .player-overlay.cinema-active .lyric-line.active .lyric-token.sung,
+body.performance-lite .player-overlay.cinema-active .lyric-line.active .lyric-token.singing { text-shadow:0 0 10px color-mix(in srgb,var(--lyric-hot) 55%,transparent); }
+body.performance-lite .beat-stage { opacity:.16; }
+body.performance-lite .beat-stage i { box-shadow:none; transition:transform .14s linear; }
+body.performance-lite .art-reflection { display:none; }

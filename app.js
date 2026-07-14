@@ -26,6 +26,9 @@
     youtubePlayer: null,
     youtubeSyncFrame: null,
     youtubeMatches: readStore('lyra:youtube-matches', {}),
+    youtubeLookupPending: false,
+    youtubeLookupTrackId: '',
+    youtubeLookupToken: null,
     translationLanguage: localStorage.getItem('lyra:translation-language') || '',
     translationCache: readStore('lyra:translations', {}),
     translationController: null,
@@ -44,6 +47,7 @@
     history: readStore('lyra:history', []),
     themeIndex: Math.max(0, Math.min(4, Number(localStorage.getItem('lyra:theme')) || 0)),
     currentView: 'discover',
+    performanceLite: false,
   };
 
   const themes = [
@@ -108,6 +112,7 @@
 
   function init() {
     bindEvents();
+    initPerformanceProfile();
     initParticles();
     initTilt();
     initMagnetic();
@@ -314,7 +319,43 @@
   }
 
   function initBeatStage() {
-    els.beatStage.innerHTML = Array.from({ length: 48 }, (_, index) => `<i style="--i:${index};--beat:.12"></i>`).join('');
+    const barCount = state.performanceLite ? 28 : 48;
+    els.beatStage.innerHTML = Array.from({ length: barCount }, (_, index) => `<i style="--i:${index};--beat:.12"></i>`).join('');
+  }
+
+  function initPerformanceProfile() {
+    const desktop = matchMedia('(pointer:fine)').matches && innerWidth >= 900;
+    const largeCanvas = innerWidth * innerHeight >= 1500000;
+    const constrainedHardware = Number(navigator.deviceMemory || 8) <= 4 || Number(navigator.hardwareConcurrency || 8) <= 4;
+    setPerformanceLite(desktop && (largeCanvas || constrainedHardware));
+  }
+
+  function setPerformanceLite(enabled) {
+    state.performanceLite = Boolean(enabled);
+    document.body.classList.toggle('performance-lite', state.performanceLite);
+    window.dispatchEvent(new CustomEvent('lyra:performance', { detail: state.performanceLite }));
+  }
+
+  function monitorFrameHealth() {
+    if (state.performanceLite || !matchMedia('(pointer:fine)').matches) return;
+    let previous = performance.now();
+    let samples = 0;
+    let slowFrames = 0;
+    const sample = now => {
+      if (!els.playerOverlay.classList.contains('open') || samples >= 90) {
+        if (samples >= 60 && slowFrames / samples > .16) {
+          setPerformanceLite(true);
+          initBeatStage();
+        }
+        return;
+      }
+      const elapsed = now - previous;
+      previous = now;
+      if (elapsed > 27) slowFrames += 1;
+      samples += 1;
+      requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
   }
 
   function openEnvironment() {
@@ -427,6 +468,7 @@
     els.playerOverlay.classList.add('open');
     els.playerOverlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    monitorFrameHealth();
     if (sourceElement) animateTrackPortal(state.currentTrack, sourceElement);
   }
 
@@ -849,8 +891,8 @@
     els.playerOverlay.classList.toggle('has-youtube', hasYouTube);
     $('#previewPlayer').style.display = hasPreview ? 'flex' : 'none';
     els.previewTimelinePlay.hidden = !hasPreview;
-    els.youtubeToggle.hidden = !hasYouTube;
-    els.youtubeToggle.classList.remove('playing');
+    els.youtubeToggle.hidden = false;
+    setYouTubeControlState(hasYouTube ? 'ready' : youtubeApiKey ? 'searching' : 'external');
     els.youtubePlayerShell.hidden = !hasYouTube;
     els.mediaFallback.hidden = hasPreview || hasYouTube;
     if (hasYouTube) mountYouTubePlayer(track.youtubeVideoId);
@@ -865,6 +907,14 @@
   }
 
   async function enrichCurrentTrackWithYouTube(track, controller) {
+    if (state.currentTrack !== track) return;
+    const lookupId = trackId(track);
+    if (state.youtubeLookupPending && state.youtubeLookupTrackId === lookupId) return;
+    const lookupToken = {};
+    state.youtubeLookupPending = true;
+    state.youtubeLookupTrackId = lookupId;
+    state.youtubeLookupToken = lookupToken;
+    setYouTubeControlState('searching');
     const fallbackCopy = $('b', els.mediaFallback);
     if (fallbackCopy) fallbackCopy.textContent = 'Buscando reproducción disponible…';
     try {
@@ -881,7 +931,8 @@
       }
       const candidates = await searchYouTube(`${track.title} ${track.artist} official audio`, controller.signal, true);
       const match = mergeSearchResults([], candidates, `${track.title} ${track.artist}`)[0];
-      if (!match || state.currentTrack !== track || state.lyricsController !== controller) return;
+      if (!match) throw new Error('No embeddable YouTube match');
+      if (state.currentTrack !== track || state.lyricsController !== controller) return;
       Object.assign(track, {
         youtubeVideoId: match.youtubeVideoId,
         youtubeTrackViewUrl: match.trackViewUrl,
@@ -892,8 +943,16 @@
       writeStore('lyra:youtube-matches', state.youtubeMatches);
       showYouTubeForTrack(track);
     } catch (error) {
-      if (error.name !== 'AbortError') console.warn('YouTube fallback unavailable', error);
+      if (error.name !== 'AbortError') {
+        console.warn('YouTube fallback unavailable', error);
+        setYouTubeControlState('error');
+      }
     } finally {
+      if (state.youtubeLookupToken === lookupToken) {
+        state.youtubeLookupPending = false;
+        state.youtubeLookupTrackId = '';
+        state.youtubeLookupToken = null;
+      }
       if (fallbackCopy) fallbackCopy.textContent = 'Sin fragmento en este catálogo';
     }
   }
@@ -903,12 +962,29 @@
     destroyYouTubePlayer();
     els.playerOverlay.classList.add('has-youtube');
     els.youtubePlayerShell.hidden = false;
-    els.youtubeToggle.hidden = false;
+    setYouTubeControlState('ready');
     els.mediaFallback.hidden = true;
     const external = $('#externalLink');
     external.href = track.youtubeTrackViewUrl || `https://www.youtube.com/watch?v=${encodeURIComponent(track.youtubeVideoId)}`;
     external.hidden = false;
     mountYouTubePlayer(track.youtubeVideoId);
+  }
+
+  function setYouTubeControlState(controlState) {
+    const labels = {
+      searching: 'BUSCANDO VIDEO',
+      ready: 'VIDEO',
+      playing: 'VIDEO',
+      error: 'REINTENTAR VIDEO',
+      external: 'ABRIR YOUTUBE',
+    };
+    els.youtubeToggle.hidden = false;
+    els.youtubeToggle.dataset.state = controlState;
+    els.youtubeToggle.classList.toggle('searching', controlState === 'searching');
+    els.youtubeToggle.classList.toggle('error', controlState === 'error' || controlState === 'external');
+    els.youtubeToggle.classList.toggle('playing', controlState === 'playing');
+    const label = $('span', els.youtubeToggle);
+    if (label) label.textContent = labels[controlState] || 'VIDEO';
   }
 
   let youtubeApiPromise = null;
@@ -943,14 +1019,21 @@
         height: '100%',
         playerVars: { playsinline: 1, rel: 0, modestbranding: 1, origin: location.origin },
         events: {
-          onReady: () => { els.youtubeState.textContent = 'YOUTUBE · LISTO'; },
+          onReady: () => {
+            els.youtubeState.textContent = 'YOUTUBE · LISTO';
+            setYouTubeControlState('ready');
+          },
           onStateChange: onYouTubeStateChange,
-          onError: () => { els.youtubeState.textContent = 'YOUTUBE · VIDEO NO DISPONIBLE'; },
+          onError: () => {
+            els.youtubeState.textContent = 'YOUTUBE · VIDEO BLOQUEADO O NO DISPONIBLE';
+            setYouTubeControlState('external');
+          },
         },
       });
     } catch (error) {
       console.error(error);
       els.youtubeState.textContent = 'YOUTUBE · ABRIR EN YOUTUBE';
+      setYouTubeControlState('external');
     }
   }
 
@@ -961,19 +1044,19 @@
     if (playing) {
       if (!els.audio.paused) els.audio.pause();
       stopLyricPlayback(false);
-      els.youtubeToggle.classList.add('playing');
+      setYouTubeControlState('playing');
       els.youtubeState.textContent = 'YOUTUBE · SINCRONIZANDO';
       els.playerOverlay.classList.remove('paused');
       els.playerOverlay.classList.add('playing');
       startYouTubeSync();
     } else if (paused) {
       stopYouTubeSync();
-      els.youtubeToggle.classList.remove('playing');
+      setYouTubeControlState('ready');
       els.youtubeState.textContent = 'YOUTUBE · PAUSA';
       if (!state.cinemaEnded && !state.lyricPlaying) els.playerOverlay.classList.add('paused');
     } else if (ended) {
       stopYouTubeSync();
-      els.youtubeToggle.classList.remove('playing');
+      setYouTubeControlState('ready');
       if (state.hasLyrics) finishCinema();
       else els.youtubeState.textContent = 'YOUTUBE · TERMINÓ';
     }
@@ -982,7 +1065,21 @@
   function toggleYouTubeVideo() {
     const player = state.youtubePlayer;
     if (!player?.getPlayerState) {
-      showToast('El video todavía se está preparando.');
+      const controlState = els.youtubeToggle.dataset.state;
+      if (controlState === 'external') {
+        window.open(state.currentTrack?.youtubeTrackViewUrl || els.youtubeSearchLink.href, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      if (state.youtubeLookupPending) {
+        showToast('Buscando el video oficial…');
+        return;
+      }
+      if (state.currentTrack && state.lyricsController && youtubeApiKey) {
+        enrichCurrentTrackWithYouTube(state.currentTrack, state.lyricsController);
+        showToast('Reintentando la búsqueda del video…');
+        return;
+      }
+      window.open(els.youtubeSearchLink.href, '_blank', 'noopener,noreferrer');
       return;
     }
     const playing = player.getPlayerState() === window.YT?.PlayerState?.PLAYING;
@@ -1880,13 +1977,13 @@
     const ctx = canvas.getContext('2d');
     let particles = [];
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = state.performanceLite ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = innerWidth * dpr;
       canvas.height = innerHeight * dpr;
       canvas.style.width = `${innerWidth}px`;
       canvas.style.height = `${innerHeight}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      particles = Array.from({ length: Math.min(55, Math.round(innerWidth / 28)) }, () => ({
+      particles = Array.from({ length: state.performanceLite ? 0 : Math.min(55, Math.round(innerWidth / 28)) }, () => ({
         x: Math.random() * innerWidth,
         y: Math.random() * innerHeight,
         r: Math.random() * 1.3 + .25,
@@ -1898,7 +1995,7 @@
     let frame = null;
     const draw = () => {
       frame = null;
-      if (!state.motion || document.hidden) return;
+      if (!state.motion || state.performanceLite || document.hidden) return;
       ctx.clearRect(0, 0, innerWidth, innerHeight);
       for (const p of particles) {
         p.x += p.vx; p.y += p.vy;
@@ -1909,12 +2006,13 @@
       frame = requestAnimationFrame(draw);
     };
     const start = () => {
-      if (state.motion && !document.hidden && !frame) frame = requestAnimationFrame(draw);
-      if (!state.motion) ctx.clearRect(0, 0, innerWidth, innerHeight);
+      if (state.motion && !state.performanceLite && !document.hidden && !frame) frame = requestAnimationFrame(draw);
+      if (!state.motion || state.performanceLite) ctx.clearRect(0, 0, innerWidth, innerHeight);
     };
     resize();
     addEventListener('resize', resize, { passive: true });
     addEventListener('lyra:motion', start);
+    addEventListener('lyra:performance', () => { resize(); start(); });
     document.addEventListener('visibilitychange', start);
     start();
   }

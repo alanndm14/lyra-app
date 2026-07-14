@@ -17,12 +17,15 @@ for (const id of ['entryGate', 'appShell', 'chartList', 'playerOverlay', 'beatSt
   assert(ids.includes(id), `Missing required UI id: ${id}`);
 }
 
-assert(html.includes('styles.css?v=8') && html.includes('app.js?v=8') && html.includes('runtime-config.js?v=8'), 'Public asset versions are not aligned');
+assert(html.includes('styles.css?v=9') && html.includes('app.js?v=9') && html.includes('runtime-config.js?v=9'), 'Public asset versions are not aligned');
 assert(app.includes(".join(' ')}<small class=\"lyric-translation\""), 'Lyric words are rendered without explicit spaces');
 assert(app.includes('itunes.apple.com/lookup?'), 'Chart entries are not resolved through exact catalog lookup');
 assert(app.includes('googleapis.com/youtube/v3/search'), 'YouTube search fallback is missing');
 assert(app.includes('if (!track.youtubeVideoId && youtubeApiKey) enrichCurrentTrackWithYouTube'), 'YouTube is not enriched for regular catalog songs');
 assert(css.includes('.youtube-timeline-toggle') && css.includes('right:160px'), 'YouTube control or collision-safe lyric header is missing');
+assert(!/id="youtubeToggle"[^>]*\shidden/.test(html), 'The YouTube status control is hidden by default');
+assert(app.includes("setYouTubeControlState('error')") && app.includes('initPerformanceProfile()'), 'Visible YouTube errors or adaptive performance are missing');
+assert(css.includes('body.performance-lite .player-stage::before'), 'Desktop performance profile styles are missing');
 assert(app.includes('api.mymemory.translated.net/get'), 'Lyrics translation provider is missing');
 assert(app.includes("writeStore('lyra:preview-offsets'"), 'Per-track preview alignment is not persisted');
 assert(!app.includes("text: 'Esta letra todavía no está disponible.'"), 'A placeholder is still being animated as lyrics');

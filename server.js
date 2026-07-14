@@ -27,6 +27,9 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`);
     if (url.pathname === '/api/search') return await handleSearch(url, res);
     if (url.pathname === '/api/lyrics') return await handleLyrics(url, res);
+    if (url.pathname === '/runtime-config.js' && process.env.YOUTUBE_API_KEY) {
+      return javascript(res, 200, `window.LYRA_CONFIG = Object.freeze(${JSON.stringify({ youtubeApiKey: process.env.YOUTUBE_API_KEY })});\n`);
+    }
     return serveStatic(url.pathname, res);
   } catch (error) {
     console.error(error);
@@ -65,7 +68,8 @@ async function handleSearch(url, res) {
 async function handleLyrics(url, res) {
   const track = (url.searchParams.get('track') || '').trim();
   const artist = (url.searchParams.get('artist') || '').trim();
-  const album = (url.searchParams.get('album') || '').trim();
+  const rawAlbum = (url.searchParams.get('album') || '').trim();
+  const album = rawAlbum === 'YouTube' ? '' : rawAlbum;
   const duration = Number(url.searchParams.get('duration') || 0);
   if (!track || !artist) return json(res, 400, { error: 'Missing track or artist' });
 
@@ -93,13 +97,19 @@ async function handleLyrics(url, res) {
 function pickBest(records, wanted) {
   if (!Array.isArray(records) || !records.length) return null;
   const normalize = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
-  const wt = normalize(wanted.track);
+  const canonical = value => normalize(value)
+    .replace(/\b(feat|ft|featuring|with|con)\b.*$/, '')
+    .replace(/\b(official|video|audio|lyrics|lyric|visualizer|remaster(ed)?|version)\b.*$/, '')
+    .trim();
+  const wt = canonical(wanted.track);
   const wa = normalize(wanted.artist);
   const wal = normalize(wanted.album);
 
   const matches = records
     .filter(record => {
-      if (normalize(record.trackName) !== wt) return false;
+      const candidate = canonical(record.trackName);
+      const rawCandidate = normalize(record.trackName);
+      if (candidate !== wt && !candidate.includes(wt) && !wt.includes(candidate) && !rawCandidate.includes(wt)) return false;
       if (!artistsMatch(wa, normalize(record.artistName))) return false;
       if (wanted.duration && record.duration && Math.abs(Number(record.duration) - wanted.duration) > 18) return false;
       return Boolean(record.syncedLyrics || record.plainLyrics);
@@ -160,6 +170,10 @@ function json(res, status, body) {
 }
 function text(res, status, body) {
   res.writeHead(status, { 'Content-Type': 'text/plain; charset=utf-8' });
+  res.end(body);
+}
+function javascript(res, status, body) {
+  res.writeHead(status, { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'no-store' });
   res.end(body);
 }
 

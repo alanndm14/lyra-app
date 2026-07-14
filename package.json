@@ -5,7 +5,7 @@
   "description": "Buscador visual e interactivo de canciones y letras.",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check app.js && node --check server.js && node --check scripts/build-charts.js && node scripts/verify-app.js",
+    "check": "node --check app.js && node --check server.js && node --check scripts/build-charts.js && node --check scripts/build-runtime-config.js && node scripts/verify-app.js",
     "charts": "node scripts/build-charts.js"
   },
   "engines": {

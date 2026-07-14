@@ -10,11 +10,11 @@
   <meta property="og:description" content="Busca una canción y mira cómo sus palabras cobran vida." />
   <meta property="og:type" content="website" />
   <title>Lyra — Lyrics feel alive</title>
-  <link rel="manifest" href="./manifest.json?v=5" />
+  <link rel="manifest" href="./manifest.json?v=6" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=5" />
+  <link rel="stylesheet" href="./styles.css?v=6" />
 </head>
 <body>
   <section class="entry-gate" id="entryGate" aria-label="Bienvenida a Lyra">
@@ -373,6 +373,10 @@
         <aside class="track-panel glass-panel">
           <div class="track-art-wrap">
             <img id="playerArtwork" alt="Portada del álbum" crossorigin="anonymous" />
+            <div class="youtube-player-shell" id="youtubePlayerShell" hidden>
+              <div id="youtubePlayer"></div>
+              <span id="youtubeState">YOUTUBE · LISTO PARA REPRODUCIR</span>
+            </div>
             <div class="art-reflection"></div>
             <span class="availability-badge" id="lyricsBadge"><i></i> LETRAS ENCONTRADAS</span>
           </div>
@@ -421,6 +425,20 @@
               <button class="control-pill active" data-mode="cinematic">CINE</button>
               <button class="control-pill" data-mode="flow">FLUJO</button>
               <button class="control-pill" data-mode="full">TEXTO</button>
+              <label class="translation-control" for="translationLanguage">
+                <span>TRADUCIR</span>
+                <select id="translationLanguage" aria-label="Traducir letra">
+                  <option value="">Original</option>
+                  <option value="es">Español</option>
+                  <option value="en">English</option>
+                  <option value="fr">Français</option>
+                  <option value="pt">Português</option>
+                  <option value="de">Deutsch</option>
+                  <option value="it">Italiano</option>
+                  <option value="ja">日本語</option>
+                  <option value="ko">한국어</option>
+                </select>
+              </label>
               <button class="round-action small" id="fontMinus" title="Reducir texto">A−</button>
               <button class="round-action small" id="fontPlus" title="Aumentar texto">A+</button>
             </div>
@@ -438,6 +456,9 @@
           <footer class="lyric-timeline" id="lyricTimeline">
             <button id="lyricPlay" aria-label="Reproducir animación de letra">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="preview-timeline-play" id="previewTimelinePlay" aria-label="Reproducir únicamente el fragmento musical" title="Fragmento musical independiente">
+              <i></i><span>FRAGMENTO</span>
             </button>
             <input id="lyricScrubber" type="range" min="0" max="100" value="0" aria-label="Posición de la letra" />
             <span class="timeline-time"><span id="lyricTime">0:00</span><small id="lyricTotal">/ 0:00</small></span>
@@ -461,10 +482,12 @@
   <nav class="mobile-nav glass-panel" aria-label="Navegación móvil">
     <button class="active" data-view="discover"><span>✦</span>Inicio</button>
     <button id="mobileSearch"><span>⌕</span>Buscar</button>
+    <button data-view="history"><span>↺</span>Historial</button>
     <button data-view="favorites"><span>♡</span>Guardadas</button>
     <button id="mobileEnvironment"><span>◉</span>Ambiente</button>
   </nav>
 
-  <script src="./app.js?v=5" defer></script>
+  <script src="./runtime-config.js?v=6"></script>
+  <script src="./app.js?v=6" defer></script>
 </body>
 </html>

@@ -81,28 +81,65 @@ async function handleLyrics(url, res) {
       duration: String(Math.round(duration)),
     });
     const cached = await fetchExternal(`https://lrclib.net/api/get-cached?${exact}`, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
-    if (cached.ok) return json(res, 200, await cached.json());
-    if (cached.status !== 404) return json(res, cached.status, { error: 'Lyrics provider unavailable' });
+    if (cached.ok) {
+      const exactLyrics = await cached.json();
+      if (exactLyrics?.syncedLyrics || exactLyrics?.plainLyrics) return json(res, 200, { ...exactLyrics, source: 'lrclib' });
+    }
   }
 
   const params = new URLSearchParams({ track_name: track, artist_name: artist });
   if (album) params.set('album_name', album);
   const response = await fetchExternal(`https://lrclib.net/api/search?${params}`, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
-  if (!response.ok) return json(res, response.status, { error: 'Lyrics provider unavailable' });
-  const records = await response.json();
-  const best = pickBest(records, { track, artist, album, duration });
-  json(res, 200, best || null);
+  const records = response.ok ? await response.json() : [];
+  let best = pickBest(records, { track, artist, album, duration });
+  const titles = lyricTitleVariants(track);
+  if (!best) {
+    for (const title of titles) {
+      for (const query of [`${title} ${artist}`, title]) {
+        const broad = new URLSearchParams({ q: query });
+        const broadResponse = await fetchExternal(`https://lrclib.net/api/search?${broad}`, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+        if (!broadResponse.ok) continue;
+        const broadRecords = await broadResponse.json();
+        best = pickBest(broadRecords, { track, artist, album, duration })
+          || pickBest(broadRecords, { track, artist, album, duration }, true);
+        if (best) break;
+      }
+      if (best) break;
+    }
+  }
+  if (best) return json(res, 200, { ...best, source: 'lrclib' });
+
+  const artists = [...new Set([artist, artist.replace(/\s+(?:official|oficial|topic)$/i, '').trim()].filter(Boolean))];
+  for (const artistName of artists) {
+    for (const title of titles) {
+      const fallback = await fetchExternal(`https://api.lyrics.ovh/v1/${encodeURIComponent(artistName)}/${encodeURIComponent(title)}`, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+      if (!fallback.ok) continue;
+      const plainLyrics = String((await fallback.json()).lyrics || '').trim();
+      if (plainLyrics.length >= 40) return json(res, 200, { plainLyrics, syncedLyrics: '', duration, source: 'lyrics.ovh' });
+    }
+  }
+  json(res, 200, null);
 }
 
-function pickBest(records, wanted) {
+function lyricTitleVariants(value) {
+  const original = String(value || '').trim();
+  const simplified = original
+    .replace(/\s*[\[(](?:en\s+vivo|live|acoustic|acústic[oa]|remaster(?:ed)?|version|versión)[^\])]*[\])]/ig, '')
+    .replace(/\s+(?:en\s+vivo|live|remaster(?:ed)?)(?:\s+version|\s+versión)?$/ig, '')
+    .replace(/\s+/g, ' ').trim();
+  return [...new Set([original, simplified].filter(Boolean))];
+}
+
+function pickBest(records, wanted, allowTitleOnly = false) {
   if (!Array.isArray(records) || !records.length) return null;
   const normalize = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
   const canonical = value => normalize(value)
     .replace(/\b(feat|ft|featuring|with|con)\b.*$/, '')
-    .replace(/\b(official|video|audio|lyrics|lyric|visualizer|remaster(ed)?|version)\b.*$/, '')
+    .replace(/\b(official|video|audio|lyrics|lyric|visualizer|remaster(ed)?|version|en vivo|live|acoustic|acustico|acustica)\b.*$/, '')
     .trim();
+  const canonicalArtist = value => normalize(value).replace(/\b(official|oficial|topic)\b.*$/, '').trim();
   const wt = canonical(wanted.track);
-  const wa = normalize(wanted.artist);
+  const wa = canonicalArtist(wanted.artist);
   const wal = normalize(wanted.album);
 
   const matches = records
@@ -110,17 +147,19 @@ function pickBest(records, wanted) {
       const candidate = canonical(record.trackName);
       const rawCandidate = normalize(record.trackName);
       if (candidate !== wt && !candidate.includes(wt) && !wt.includes(candidate) && !rawCandidate.includes(wt)) return false;
-      if (!artistsMatch(wa, normalize(record.artistName))) return false;
-      if (wanted.duration && record.duration && Math.abs(Number(record.duration) - wanted.duration) > 18) return false;
+      const artistMatches = artistsMatch(wa, canonicalArtist(record.artistName));
+      if (!artistMatches && (!allowTitleOnly || candidate !== wt)) return false;
       return Boolean(record.syncedLyrics || record.plainLyrics);
     })
     .map(record => {
       let score = 0;
       const ral = normalize(record.albumName);
       if (wal && ral === wal) score += 5;
-      if (record.syncedLyrics) score += 3;
-      if (record.plainLyrics) score += 1;
-      if (wanted.duration && record.duration) score += Math.max(0, 3 - Math.abs(Number(record.duration) - wanted.duration) / 8);
+      const durationDelta = wanted.duration && record.duration ? Math.abs(Number(record.duration) - wanted.duration) : 0;
+      if (record.syncedLyrics && (!wanted.duration || !record.duration || durationDelta <= 75)) score += 6;
+      if (record.plainLyrics) score += 3;
+      if (artistsMatch(wa, canonicalArtist(record.artistName))) score += 5;
+      if (wanted.duration && record.duration) score += Math.max(0, 4 - durationDelta / 12);
       return { record, score };
     })
     .sort((a, b) => b.score - a.score);

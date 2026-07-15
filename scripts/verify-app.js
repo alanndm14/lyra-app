@@ -17,7 +17,7 @@ for (const id of ['entryGate', 'appShell', 'chartList', 'playerOverlay', 'beatSt
   assert(ids.includes(id), `Missing required UI id: ${id}`);
 }
 
-assert(html.includes('styles.css?v=14') && html.includes('app.js?v=14') && html.includes('runtime-config.js?v=14'), 'Public asset versions are not aligned');
+assert(html.includes('styles.css?v=15') && html.includes('app.js?v=15') && html.includes('runtime-config.js?v=15'), 'Public asset versions are not aligned');
 assert(app.includes(".join(' ')}<small class=\"lyric-translation\""), 'Lyric words are rendered without explicit spaces');
 assert(app.includes('itunes.apple.com/lookup?'), 'Chart entries are not resolved through exact catalog lookup');
 assert(app.includes('googleapis.com/youtube/v3/search'), 'YouTube search fallback is missing');
@@ -50,6 +50,11 @@ assert(app.includes("if (state.filter === 'album') return searchAppleAlbumTracks
 assert(app.includes("mode === 'artist' ? ['artistTerm']") && app.includes('passesSearchMode(track, query, mode)'), 'Artist filter is not isolated from other search fields');
 assert(app.includes("mode === 'song' ? ['songTerm', '']") && app.includes('modeMatchScore(track, query, mode)'), 'Song filter does not prioritize titles');
 assert(app.includes("entity: 'song',") && app.includes('albumsByMarket'), 'Album tracks are not loaded from the selected collections');
+assert(app.includes('api.lyrics.ovh/v1/') && app.includes('lyricTitleVariants'), 'Plain-lyrics provider fallback is missing');
+assert(app.includes("if (!data.syncedLyrics) setLyricMode('full')") && css.includes('.player-overlay.plain-lyrics .lyrics-panel'), 'Unsynced lyrics do not degrade to a visible text layout');
+assert((app.match(/if \(data\?\.syncedLyrics \|\| data\?\.plainLyrics\) state\.lyricsCache\.set/g) || []).length === 2, 'Negative lyric results can still poison the session cache');
+assert(app.includes('durationDelta <= 75') && app.includes('canonicalArtist'), 'Lyrics matching is too strict for live versions');
+assert(app.includes("['flow', 'full'].includes(state.lyricMode)"), 'Full-text lyrics do not follow estimated playback timing');
 
 const markets = Object.entries(chartBundle.charts || {});
 assert(markets.length >= 8, 'Expected global plus seven country charts');

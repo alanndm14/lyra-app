@@ -276,15 +276,7 @@
 
     $$('.control-pill').forEach(button => {
       button.addEventListener('click', () => {
-        $$('.control-pill').forEach(b => b.classList.remove('active'));
-        button.classList.add('active');
-        state.lyricMode = button.dataset.mode;
-        els.playerOverlay.classList.toggle('cinema-active', state.lyricMode === 'cinematic');
-        els.lyricsContent.classList.toggle('full-mode', state.lyricMode === 'full');
-        els.lyricsContent.classList.toggle('flow-mode', state.lyricMode === 'flow');
-        els.lyricsContent.classList.toggle('cinematic-mode', state.lyricMode === 'cinematic');
-        els.lyricEcho.hidden = state.lyricMode !== 'cinematic';
-        updateLyricUI(true);
+        setLyricMode(button.dataset.mode);
       });
     });
 
@@ -319,6 +311,17 @@
   function initEntry() {
     document.body.classList.add('entry-open');
     els.entryGate.setAttribute('aria-hidden', 'false');
+  }
+
+  function setLyricMode(mode, refresh = true) {
+    state.lyricMode = ['cinematic', 'flow', 'full'].includes(mode) ? mode : 'cinematic';
+    $$('.control-pill').forEach(button => button.classList.toggle('active', button.dataset.mode === state.lyricMode));
+    els.playerOverlay.classList.toggle('cinema-active', state.lyricMode === 'cinematic');
+    els.lyricsContent.classList.toggle('full-mode', state.lyricMode === 'full');
+    els.lyricsContent.classList.toggle('flow-mode', state.lyricMode === 'flow');
+    els.lyricsContent.classList.toggle('cinematic-mode', state.lyricMode === 'cinematic');
+    els.lyricEcho.hidden = state.lyricMode !== 'cinematic';
+    if (refresh && state.lyrics.length) updateLyricUI(true);
   }
 
   function enterApp() {
@@ -496,7 +499,7 @@
 
   function openPlayer(sourceElement = null) {
     clearCinemaSequence();
-    els.playerOverlay.classList.remove('closing', 'playing', 'paused', 'ended', 'background-ready', 'lyrics-ready', 'no-lyrics', 'intro-presenting', 'intro-metadata', 'intro-syncing', 'intro-ready');
+    els.playerOverlay.classList.remove('closing', 'playing', 'paused', 'ended', 'background-ready', 'lyrics-ready', 'no-lyrics', 'plain-lyrics', 'intro-presenting', 'intro-metadata', 'intro-syncing', 'intro-ready');
     els.playerOverlay.classList.add('phase-loading', 'phase-black');
     els.playerOverlay.classList.toggle('cinema-active', state.lyricMode === 'cinematic');
     els.endCredits.setAttribute('aria-hidden', 'true');
@@ -874,8 +877,7 @@
     stopLyricPlayback();
     els.audio.pause();
     state.currentTrack = track;
-    state.lyricMode = 'cinematic';
-    $$('.control-pill').forEach(button => button.classList.toggle('active', button.dataset.mode === 'cinematic'));
+    setLyricMode('cinematic', false);
     state.lyrics = [];
     state.plainLyrics = '';
     state.lyricTime = 0;
@@ -940,7 +942,7 @@
         data = await directLyricsSearch(track, controller.signal);
       }
       if (state.lyricsController === controller) {
-        state.lyricsCache.set(cacheKey, data);
+        if (data?.syncedLyrics || data?.plainLyrics) state.lyricsCache.set(cacheKey, data);
         consumeLyrics(data);
       }
     } catch (error) {
@@ -949,7 +951,7 @@
       try {
         const data = await directLyricsSearch(track, controller.signal);
         if (state.lyricsController === controller) {
-          state.lyricsCache.set(cacheKey, data);
+          if (data?.syncedLyrics || data?.plainLyrics) state.lyricsCache.set(cacheKey, data);
           consumeLyrics(data);
         }
       } catch (fallbackError) {
@@ -974,6 +976,7 @@
       els.lyricsContent.innerHTML = '';
       els.lyricEcho.innerHTML = '';
       els.playerOverlay.classList.add('no-lyrics');
+      els.playerOverlay.classList.remove('plain-lyrics');
       els.lyricPlay.disabled = true;
       els.lyricScrubber.disabled = true;
       $('#copyLyricsBtn').disabled = true;
@@ -989,12 +992,13 @@
 
     state.hasLyrics = true;
     els.playerOverlay.classList.remove('no-lyrics');
+    els.playerOverlay.classList.toggle('plain-lyrics', !data.syncedLyrics);
     els.lyricPlay.disabled = false;
     els.lyricScrubber.disabled = false;
     $('#copyLyricsBtn').disabled = false;
-    $('#lyricsBadge').innerHTML = `<i></i> ${data.syncedLyrics ? 'LETRA SINCRONIZADA' : 'LETRA COMPLETA'}`;
-    $('#lyricsKicker').textContent = data.syncedLyrics ? 'TIEMPOS LRC · ESCENA CINÉTICA' : 'LETRA COMPLETA · RITMO ESTIMADO';
-    $('#lyricsHeading').textContent = data.syncedLyrics ? 'Cada línea entra exactamente a tiempo.' : 'Lyra convierte el texto en un pulso visual.';
+    $('#lyricsBadge').innerHTML = `<i></i> ${data.syncedLyrics ? 'LETRA SINCRONIZADA' : 'LETRA COMPLETA · TEXTO'}`;
+    $('#lyricsKicker').textContent = data.syncedLyrics ? 'TIEMPOS LRC · ESCENA CINÉTICA' : 'LETRA COMPLETA · MODO TEXTO';
+    $('#lyricsHeading').textContent = data.syncedLyrics ? 'Cada línea entra exactamente a tiempo.' : 'La letra completa está disponible para leer.';
     state.plainLyrics = data.plainLyrics || stripLrc(data.syncedLyrics || '');
     state.lyrics = data.syncedLyrics ? parseLrc(data.syncedLyrics) : plainToTimed(data.plainLyrics || '');
     state.lyricDuration = Math.max(
@@ -1004,6 +1008,7 @@
       30
     );
     renderLyrics();
+    if (!data.syncedLyrics) setLyricMode('full');
     state.lyricsReady = true;
     refreshYouTubeTiming();
     revealCinemaWhenReady();
@@ -1029,21 +1034,94 @@
         album_name: meaningfulAlbum,
         duration: String(duration),
       });
-      const cached = await fetchWithDeadline(`https://lrclib.net/api/get-cached?${exact}`, {
-        signal,
-        headers: { Accept: 'application/json' },
-      }, 7500);
-      if (cached.ok) return cached.json();
-      if (cached.status !== 404) throw new Error(`Lyrics cache failed ${cached.status}`);
+      try {
+        const cached = await fetchWithDeadline(`https://lrclib.net/api/get-cached?${exact}`, {
+          signal,
+          headers: { Accept: 'application/json' },
+        }, 7500);
+        if (cached.ok) {
+          const exactLyrics = await cached.json();
+          if (exactLyrics?.syncedLyrics || exactLyrics?.plainLyrics) return { ...exactLyrics, source: 'lrclib' };
+        }
+      } catch (error) {
+        if (error.name === 'AbortError') throw error;
+        console.info('Exact lyrics lookup unavailable; continuing with search', error);
+      }
     }
-    const params = new URLSearchParams({ track_name: track.title, artist_name: track.artist });
-    if (meaningfulAlbum) params.set('album_name', meaningfulAlbum);
-    const response = await fetchWithDeadline(`https://lrclib.net/api/search?${params}`, {
-      signal,
-      headers: { Accept: 'application/json' },
-    }, 7500);
-    if (!response.ok) throw new Error(`Lyrics provider failed ${response.status}`);
-    return pickBestLyrics(await response.json(), track);
+
+    const titles = lyricTitleVariants(track.title);
+    const searches = [];
+    const exactParams = new URLSearchParams({ track_name: track.title, artist_name: track.artist });
+    if (meaningfulAlbum) exactParams.set('album_name', meaningfulAlbum);
+    searches.push(exactParams);
+    titles.forEach(title => searches.push(new URLSearchParams({ track_name: title, artist_name: track.artist })));
+    titles.forEach(title => searches.push(new URLSearchParams({ q: `${title} ${track.artist}` })));
+    titles.forEach(title => searches.push(new URLSearchParams({ q: title })));
+
+    const seen = new Set();
+    const records = [];
+    for (const params of searches) {
+      const url = `https://lrclib.net/api/search?${params}`;
+      if (seen.has(url)) continue;
+      seen.add(url);
+      try {
+        const response = await fetchWithDeadline(url, {
+          signal,
+          headers: { Accept: 'application/json' },
+        }, 7500);
+        if (!response.ok) continue;
+        records.push(...await response.json());
+        const best = pickBestLyrics(records, track);
+        if (best?.syncedLyrics || best?.plainLyrics) return { ...best, source: 'lrclib' };
+      } catch (error) {
+        if (error.name === 'AbortError') throw error;
+        console.info('Lyrics search variant unavailable', error);
+      }
+    }
+
+    const titleOnly = pickBestLyrics(records, track, true);
+    if (titleOnly?.syncedLyrics || titleOnly?.plainLyrics) return { ...titleOnly, source: 'lrclib-title' };
+    return fetchPlainLyricsFallback(track, titles, signal);
+  }
+
+  function lyricTitleVariants(value) {
+    const original = String(value || '').trim();
+    const simplified = original
+      .replace(/\s*[\[(](?:en\s+vivo|live|acoustic|acústic[oa]|remaster(?:ed)?|version|versión)[^\])]*[\])]/ig, '')
+      .replace(/\s+(?:en\s+vivo|live|remaster(?:ed)?)(?:\s+version|\s+versión)?$/ig, '')
+      .replace(/\s+/g, ' ').trim();
+    return [...new Set([original, simplified].filter(Boolean))];
+  }
+
+  async function fetchPlainLyricsFallback(track, titles, signal) {
+    const artists = [...new Set([
+      String(track.artist || '').trim(),
+      String(track.artist || '').replace(/\s+(?:official|oficial|topic)$/i, '').trim(),
+    ].filter(Boolean))];
+    for (const artist of artists) {
+      for (const title of titles) {
+        try {
+          const response = await fetchWithDeadline(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`, {
+            signal,
+            headers: { Accept: 'application/json' },
+          }, 8500);
+          if (!response.ok) continue;
+          const plainLyrics = String((await response.json()).lyrics || '').trim();
+          if (plainLyrics.length >= 40) {
+            return {
+              plainLyrics,
+              syncedLyrics: '',
+              duration: Number(track.durationMs || 0) / 1000,
+              source: 'lyrics.ovh',
+            };
+          }
+        } catch (error) {
+          if (error.name === 'AbortError') throw error;
+          console.info('Plain lyrics fallback unavailable', error);
+        }
+      }
+    }
+    return null;
   }
 
   function renderTrackMeta(track) {
@@ -1703,8 +1781,9 @@
     }
 
     const active = state.lyricElements[activeIndex];
-    if (active && (forceScroll || lineChanged) && state.lyricMode === 'flow') {
-      const target = active.offsetTop - els.lyricsViewport.clientHeight / 2 + active.offsetHeight / 2;
+    if (active && (forceScroll || lineChanged) && ['flow', 'full'].includes(state.lyricMode)) {
+      const anchor = state.lyricMode === 'full' ? .28 : .5;
+      const target = active.offsetTop - els.lyricsViewport.clientHeight * anchor + active.offsetHeight / 2;
       els.lyricsViewport.scrollTo({ top: Math.max(0, target), behavior: state.motion ? 'smooth' : 'auto' });
     }
 
@@ -2266,27 +2345,29 @@
     return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
   }
 
-  function pickBestLyrics(records, track) {
+  function pickBestLyrics(records, track, allowTitleOnly = false) {
     if (!Array.isArray(records) || !records.length) return null;
     const wantedTitle = canonicalTitle(track.title);
-    const wantedArtist = normalizeText(track.artist);
+    const wantedArtist = canonicalArtist(track.artist);
     const wantedDuration = Number(track.durationMs || 0) / 1000;
     const candidates = records.filter(record => {
       const candidateTitle = canonicalTitle(record.trackName);
       const rawCandidateTitle = normalizeText(record.trackName);
       if (candidateTitle !== wantedTitle && !candidateTitle.includes(wantedTitle) && !wantedTitle.includes(candidateTitle) && !rawCandidateTitle.includes(wantedTitle)) return false;
-      if (!artistsMatch(wantedArtist, normalizeText(record.artistName))) return false;
-      if (wantedDuration && record.duration && Math.abs(Number(record.duration) - wantedDuration) > 18) return false;
+      const artistMatches = artistsMatch(wantedArtist, canonicalArtist(record.artistName));
+      if (!artistMatches && (!allowTitleOnly || candidateTitle !== wantedTitle)) return false;
       return Boolean(record.syncedLyrics || record.plainLyrics);
     });
     if (!candidates.length) return null;
     return candidates.sort((a, b) => {
       const score = record => {
         let value = 0;
-        if (record.syncedLyrics) value += 2;
-        if (record.plainLyrics) value += 1;
+        const durationDelta = wantedDuration && record.duration ? Math.abs(Number(record.duration) - wantedDuration) : 0;
+        if (record.syncedLyrics && (!wantedDuration || !record.duration || durationDelta <= 75)) value += 6;
+        if (record.plainLyrics) value += 3;
+        if (artistsMatch(wantedArtist, canonicalArtist(record.artistName))) value += 5;
         if (normalizeText(record.albumName) === normalizeText(track.album)) value += 3;
-        if (wantedDuration && record.duration) value += Math.max(0, 3 - Math.abs(Number(record.duration) - wantedDuration) / 6);
+        if (wantedDuration && record.duration) value += Math.max(0, 4 - durationDelta / 12);
         return value;
       };
       return score(b) - score(a);
@@ -2306,8 +2387,12 @@
   function canonicalTitle(value) {
     return normalizeText(value)
       .replace(/\b(feat|ft|featuring|with|con)\b.*$/, '')
-      .replace(/\b(official|video|audio|lyrics|lyric|visualizer|remaster(ed)?|version)\b.*$/, '')
+      .replace(/\b(official|video|audio|lyrics|lyric|visualizer|remaster(ed)?|version|en vivo|live|acoustic|acustico|acustica)\b.*$/, '')
       .trim();
+  }
+
+  function canonicalArtist(value) {
+    return normalizeText(value).replace(/\b(official|oficial|topic)\b.*$/, '').trim();
   }
 
   function trackId(track) { return String(track.id || `${track.artist}|${track.title}|${track.album}`).toLowerCase(); }

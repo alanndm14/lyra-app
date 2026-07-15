@@ -4,6 +4,8 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const youtubeApiKey = String(window.LYRA_CONFIG?.youtubeApiKey || '').trim();
+  const LYRIC_LEAD_SECONDS = 1;
+  const SYNC_DURATION_TOLERANCE_SECONDS = 4;
 
   const state = {
     filter: 'all',
@@ -45,12 +47,22 @@
     backgroundReady: false,
     lyricsReady: false,
     hasLyrics: false,
+    hasSyncedLyrics: false,
+    exactSyncAvailable: false,
+    lyricReferenceDuration: 0,
+    syncFallbackForced: false,
+    durationRecoveryTried: false,
+    durationRecoveryTimer: null,
     cinemaEnded: false,
     cinemaSequenceReady: false,
     cinemaSequenceTimers: [],
     beatFrame: null,
     beatBars: [],
     beatPaintAt: 0,
+    energyEnvelope: [],
+    energyTrackId: '',
+    energyController: null,
+    energySeed: 1,
     returnToResults: false,
     motion: localStorage.getItem('lyra:motion') !== 'off',
     favorites: readStore('lyra:favorites', []),
@@ -314,14 +326,29 @@
   }
 
   function setLyricMode(mode, refresh = true) {
-    state.lyricMode = ['cinematic', 'flow', 'full'].includes(mode) ? mode : 'cinematic';
+    const requested = ['cinematic', 'flow', 'full'].includes(mode) ? mode : 'cinematic';
+    const nextMode = state.hasLyrics && !state.exactSyncAvailable ? 'full' : requested;
+    if (nextMode !== state.lyricMode) state.activeLyricIndex = -1;
+    state.lyricMode = nextMode;
     $$('.control-pill').forEach(button => button.classList.toggle('active', button.dataset.mode === state.lyricMode));
     els.playerOverlay.classList.toggle('cinema-active', state.lyricMode === 'cinematic');
     els.lyricsContent.classList.toggle('full-mode', state.lyricMode === 'full');
     els.lyricsContent.classList.toggle('flow-mode', state.lyricMode === 'flow');
     els.lyricsContent.classList.toggle('cinematic-mode', state.lyricMode === 'cinematic');
     els.lyricEcho.hidden = state.lyricMode !== 'cinematic';
+    if (state.lyricMode === 'full') clearLyricHighlights();
     if (refresh && state.lyrics.length) updateLyricUI(true);
+  }
+
+  function clearLyricHighlights() {
+    state.lyricElements.forEach(line => {
+      line.classList.remove('active', 'past', 'upcoming');
+      line.style.removeProperty('--line-progress');
+      $$('.lyric-token', line).forEach(token => {
+        token.classList.remove('sung', 'singing');
+        token.style.removeProperty('--fill');
+      });
+    });
   }
 
   function enterApp() {
@@ -353,7 +380,7 @@
   }
 
   function initBeatStage() {
-    const barCount = state.performanceLite ? 18 : 48;
+    const barCount = state.performanceLite ? 16 : 32;
     els.beatStage.innerHTML = Array.from({ length: barCount }, (_, index) => `<i style="--i:${index};--beat:.12"></i>`).join('');
     els.beatStage.style.setProperty('--beat-columns', String(barCount));
     state.beatBars = $$('#beatStage i');
@@ -368,7 +395,7 @@
 
   function setPerformanceLite(enabled) {
     state.performanceLite = Boolean(enabled);
-    state.visualFps = state.performanceLite ? 24 : 36;
+    state.visualFps = state.performanceLite ? 20 : 30;
     document.body.classList.toggle('performance-lite', state.performanceLite);
     window.dispatchEvent(new CustomEvent('lyra:performance', { detail: state.performanceLite }));
   }
@@ -518,6 +545,10 @@
     state.audioContext?.suspend?.().catch?.(() => {});
     stopYouTubeSync();
     destroyYouTubePlayer();
+    state.energyController?.abort();
+    state.energyController = null;
+    clearTimeout(state.durationRecoveryTimer);
+    state.durationRecoveryTimer = null;
     clearCinemaSequence();
     state.youtubeReady = false;
     state.audioSync = false;
@@ -877,7 +908,6 @@
     stopLyricPlayback();
     els.audio.pause();
     state.currentTrack = track;
-    setLyricMode('cinematic', false);
     state.lyrics = [];
     state.plainLyrics = '';
     state.lyricTime = 0;
@@ -891,9 +921,18 @@
     state.backgroundReady = false;
     state.lyricsReady = false;
     state.hasLyrics = false;
+    state.hasSyncedLyrics = false;
+    state.exactSyncAvailable = false;
+    state.lyricReferenceDuration = 0;
+    state.syncFallbackForced = false;
+    state.durationRecoveryTried = false;
+    clearTimeout(state.durationRecoveryTimer);
+    state.durationRecoveryTimer = null;
     state.cinemaEnded = false;
     state.youtubeDuration = 0;
     state.youtubeTimeScale = 1;
+    setLyricMode('cinematic', false);
+    prepareTrackEnergy(track);
     updateFavoriteButton();
     renderTrackMeta(track);
     applyTrackTheme(track).finally(() => {
@@ -968,6 +1007,8 @@
     if (!data || (!data.syncedLyrics && !data.plainLyrics)) {
       $('#lyricsBadge').innerHTML = '<i style="background:#ff786e;box-shadow:0 0 10px #ff786e"></i> SIN LETRA DISPONIBLE';
       state.hasLyrics = false;
+      state.hasSyncedLyrics = false;
+      state.exactSyncAvailable = false;
       state.plainLyrics = '';
       state.lyrics = [];
       state.lyricElements = [];
@@ -991,6 +1032,13 @@
     }
 
     state.hasLyrics = true;
+    state.hasSyncedLyrics = Boolean(data.syncedLyrics);
+    state.lyricReferenceDuration = Math.max(
+      Number(data.duration || 0),
+      data.syncedLyrics ? (parseLrc(data.syncedLyrics).at(-1)?.time || 0) : 0,
+      0
+    );
+    state.exactSyncAvailable = state.hasSyncedLyrics;
     els.playerOverlay.classList.remove('no-lyrics');
     els.playerOverlay.classList.toggle('plain-lyrics', !data.syncedLyrics);
     els.lyricPlay.disabled = false;
@@ -1008,7 +1056,8 @@
       30
     );
     renderLyrics();
-    if (!data.syncedLyrics) setLyricMode('full');
+    reconcileExactSync();
+    if (!state.exactSyncAvailable) setLyricMode('full');
     state.lyricsReady = true;
     refreshYouTubeTiming();
     revealCinemaWhenReady();
@@ -1168,7 +1217,7 @@
     els.syncState.innerHTML = '<i></i> PULSO VISUAL';
   }
 
-  async function enrichCurrentTrackWithYouTube(track, isRetry = false) {
+  async function enrichCurrentTrackWithYouTube(track, isRetry = false, preferredDurationMs = 0) {
     if (state.currentTrack !== track) return;
     const lookupId = trackId(track);
     if (state.youtubeLookupPending && state.youtubeLookupTrackId === lookupId) return;
@@ -1183,10 +1232,20 @@
     const fallbackCopy = $('b', els.mediaFallback);
     if (fallbackCopy) fallbackCopy.textContent = 'Buscando reproducción disponible…';
     try {
-      if (isRetry) delete state.youtubeMatches[trackId(track)];
-      let cached = state.youtubeMatches[trackId(track)];
-      if (cached?.durationMs && track.durationMs && Math.abs(Number(cached.durationMs) - Number(track.durationMs)) > 35000) {
-        delete state.youtubeMatches[trackId(track)];
+      const identityKey = youtubeIdentityKey(track);
+      const targetDuration = Number(preferredDurationMs || track.durationMs || 0);
+      if (isRetry) {
+        delete state.youtubeMatches[lookupId];
+        delete state.youtubeMatches[identityKey];
+      }
+      let cached = state.youtubeMatches[lookupId] || state.youtubeMatches[identityKey];
+      if (cached && cached.identity !== identityKey) {
+        delete state.youtubeMatches[lookupId];
+        cached = state.youtubeMatches[identityKey]?.identity === identityKey ? state.youtubeMatches[identityKey] : null;
+      }
+      if (cached?.durationMs && targetDuration && !durationsCompatible(Number(cached.durationMs) / 1000, targetDuration / 1000)) {
+        delete state.youtubeMatches[lookupId];
+        delete state.youtubeMatches[identityKey];
         cached = null;
       }
       if (cached?.videoId) {
@@ -1200,12 +1259,14 @@
         if (state.currentTrack === track) showYouTubeForTrack(track);
         return;
       }
-      const candidates = await searchYouTube(`${track.title} ${track.artist} official audio`, controller.signal, true);
-      const rankedMatches = mergeSearchResults([], candidates, `${track.title} ${track.artist}`, 'song');
-      const targetDuration = Number(track.durationMs || 0);
-      const match = targetDuration
-        ? rankedMatches.find(candidate => candidate.durationMs && Math.abs(candidate.durationMs - targetDuration) <= 22000) || rankedMatches[0]
-        : rankedMatches[0];
+      const candidatesById = new Map();
+      let match = null;
+      for (const query of youtubeSearchQueries(track)) {
+        const results = await searchYouTube(query, controller.signal, true);
+        results.forEach(candidate => candidatesById.set(candidate.youtubeVideoId, candidate));
+        match = pickYouTubeMatch([...candidatesById.values()], track, targetDuration);
+        if (match && (!targetDuration || durationsCompatible(match.durationMs / 1000, targetDuration / 1000))) break;
+      }
       if (!match) throw new Error('No embeddable YouTube match');
       if (state.currentTrack !== track) return;
       Object.assign(track, {
@@ -1215,9 +1276,13 @@
         durationMs: track.durationMs || match.durationMs,
         source: `${track.source || 'catalog'}+youtube`,
       });
-      state.youtubeMatches[trackId(track)] = { videoId: match.youtubeVideoId, durationMs: match.durationMs || 0 };
+      const cacheMatch = { videoId: match.youtubeVideoId, durationMs: match.durationMs || 0, identity: identityKey };
+      state.youtubeMatches[lookupId] = cacheMatch;
+      state.youtubeMatches[identityKey] = cacheMatch;
       writeStore('lyra:youtube-matches', state.youtubeMatches);
       showYouTubeForTrack(track);
+      refreshYouTubeTiming();
+      reconcileExactSync();
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.warn('YouTube fallback unavailable', error);
@@ -1233,6 +1298,52 @@
       if (state.youtubeController === controller) state.youtubeController = null;
       if (fallbackCopy) fallbackCopy.textContent = 'Sin fragmento en este catálogo';
     }
+  }
+
+  function youtubeIdentityKey(track) {
+    return `identity:${canonicalArtist(track.artist)}|${canonicalTitle(track.title)}`;
+  }
+
+  function youtubeSearchQueries(track) {
+    const title = canonicalTitle(track.title) || normalizeText(track.title);
+    const artist = canonicalArtist(track.artist) || normalizeText(track.artist);
+    const live = /\b(en vivo|live|concert|acoustic|acústic[oa])\b/i.test(`${track.title} ${track.album || ''}`);
+    return [...new Set([
+      `${artist} ${title}${live ? ' en vivo' : ''}`,
+      `"${title}" "${artist}"`,
+      `${track.artist} ${track.title} ${live ? 'video oficial' : 'official audio'}`,
+    ].map(value => value.replace(/\s+/g, ' ').trim()).filter(Boolean))];
+  }
+
+  function pickYouTubeMatch(candidates, track, targetDurationMs = 0) {
+    const wantedTitle = canonicalTitle(track.title);
+    const wantedArtist = canonicalArtist(track.artist);
+    const wantedWords = new Set(wantedTitle.split(' ').filter(word => word.length > 1));
+    const targetSeconds = Number(targetDurationMs || 0) / 1000;
+    const scored = candidates.map(candidate => {
+      const candidateTitle = canonicalTitle(candidate.title);
+      const candidateArtist = canonicalArtist(candidate.artist);
+      const candidateWords = new Set(candidateTitle.split(' ').filter(word => word.length > 1));
+      const sharedWords = [...wantedWords].filter(word => candidateWords.has(word)).length;
+      const titleRatio = sharedWords / Math.max(1, Math.min(wantedWords.size, candidateWords.size));
+      const titleMatches = candidateTitle === wantedTitle
+        || candidateTitle.includes(wantedTitle)
+        || wantedTitle.includes(candidateTitle)
+        || titleRatio >= .72;
+      const artistMatches = artistsMatch(wantedArtist, candidateArtist)
+        || normalizeText(candidate.title).includes(wantedArtist);
+      if (!titleMatches || (!artistMatches && titleRatio < 1)) return null;
+      const durationSeconds = Number(candidate.durationMs || 0) / 1000;
+      const durationDelta = targetSeconds && durationSeconds ? Math.abs(durationSeconds - targetSeconds) : Infinity;
+      const exactDuration = durationDelta <= SYNC_DURATION_TOLERANCE_SECONDS;
+      const official = /\b(official|oficial|topic)\b/i.test(`${candidate.artist} ${candidate.title}`);
+      const score = (candidateTitle === wantedTitle ? 80 : 45 * titleRatio)
+        + (artistMatches ? 55 : 0)
+        + (official ? 8 : 0)
+        + (exactDuration ? 100 - durationDelta * 8 : targetSeconds ? Math.max(-80, 20 - durationDelta * 3) : 0);
+      return { candidate, score, durationDelta };
+    }).filter(Boolean).sort((left, right) => right.score - left.score || left.durationDelta - right.durationDelta);
+    return scored[0]?.candidate || null;
   }
 
   function showYouTubeForTrack(track) {
@@ -1377,6 +1488,7 @@
       if (!track || !youtubeApiKey) return;
       destroyYouTubePlayer();
       delete state.youtubeMatches[trackId(track)];
+      delete state.youtubeMatches[youtubeIdentityKey(track)];
       delete track.youtubeVideoId;
       delete track.youtubeTrackViewUrl;
       writeStore('lyra:youtube-matches', state.youtubeMatches);
@@ -1399,7 +1511,11 @@
         return;
       }
       if (state.currentTrack && youtubeApiKey) {
-        enrichCurrentTrackWithYouTube(state.currentTrack, true);
+        enrichCurrentTrackWithYouTube(
+          state.currentTrack,
+          true,
+          state.lyricReferenceDuration ? state.lyricReferenceDuration * 1000 : 0
+        );
         showToast('Reintentando la búsqueda del video…');
         return;
       }
@@ -1435,7 +1551,9 @@
         els.youtubeState.textContent = 'YOUTUBE · ESPERANDO AL VIDEO';
       } else if (state.hasLyrics && currentTime > .15) {
         state.audioSync = true;
-        els.youtubeState.textContent = 'YOUTUBE · LETRA SINCRONIZADA';
+        els.youtubeState.textContent = state.exactSyncAvailable
+          ? 'YOUTUBE · LETRA SINCRONIZADA'
+          : 'YOUTUBE · LETRA EN RECORRIDO CONTINUO';
         state.lyricTime = videoToLyricTime(currentTime);
         updateLyricUI();
       }
@@ -1451,22 +1569,90 @@
   }
 
   function refreshYouTubeTiming() {
-    const duration = Number(state.youtubePlayer?.getDuration?.()) || Number(state.currentTrack?.youtubeDurationMs || 0) / 1000;
+    const duration = Number(state.youtubePlayer?.getDuration?.())
+      || Number(state.currentTrack?.youtubeDurationMs || 0) / 1000
+      || (state.currentTrack?.youtubeVideoId ? Number(state.currentTrack?.durationMs || 0) / 1000 : 0);
     if (duration < 10) return;
+    const durationChanged = Math.abs(duration - state.youtubeDuration) > .25;
     state.youtubeDuration = duration;
-    const lyricDuration = Number(state.lyricDuration || 0);
+    const lyricDuration = Number(state.lyricReferenceDuration || state.lyricDuration || 0);
     state.youtubeTimeScale = lyricDuration >= 10
       ? Math.max(.75, Math.min(1.25, lyricDuration / duration))
       : 1;
+    if (durationChanged && state.hasLyrics) reconcileExactSync();
   }
 
   function videoToLyricTime(videoTime) {
-    return Math.max(0, Math.min(state.lyricDuration, Number(videoTime || 0) * state.youtubeTimeScale));
+    const lead = state.exactSyncAvailable ? LYRIC_LEAD_SECONDS : 0;
+    return Math.max(0, Math.min(state.lyricDuration, (Number(videoTime || 0) + lead) * state.youtubeTimeScale));
   }
 
   function lyricToVideoTime(lyricTime) {
     const scale = state.youtubeTimeScale || 1;
-    return Math.max(0, Math.min(state.youtubeDuration || Infinity, Number(lyricTime || 0) / scale));
+    const lead = state.exactSyncAvailable ? LYRIC_LEAD_SECONDS : 0;
+    return Math.max(0, Math.min(state.youtubeDuration || Infinity, Number(lyricTime || 0) / scale - lead));
+  }
+
+  function durationsCompatible(leftSeconds, rightSeconds) {
+    const left = Number(leftSeconds || 0);
+    const right = Number(rightSeconds || 0);
+    return left >= 10 && right >= 10 && Math.abs(left - right) <= SYNC_DURATION_TOLERANCE_SECONDS;
+  }
+
+  function reconcileExactSync() {
+    if (!state.hasLyrics) return;
+    const videoDuration = Number(
+      state.youtubeDuration
+      || Number(state.currentTrack?.youtubeDurationMs || 0) / 1000
+      || (state.currentTrack?.youtubeVideoId ? Number(state.currentTrack?.durationMs || 0) / 1000 : 0)
+    );
+    const lyricDuration = Number(state.lyricReferenceDuration || 0);
+    const hasComparableDurations = videoDuration >= 10 && lyricDuration >= 10;
+    const compatible = !hasComparableDurations || durationsCompatible(videoDuration, lyricDuration);
+    const exact = state.hasSyncedLyrics && compatible;
+    const changed = exact !== state.exactSyncAvailable;
+    const wasForced = state.syncFallbackForced;
+    state.exactSyncAvailable = exact;
+    state.syncFallbackForced = state.hasSyncedLyrics && hasComparableDurations && !compatible;
+    els.playerOverlay.classList.toggle('plain-lyrics', !exact);
+
+    if (!state.hasSyncedLyrics) {
+      $('#lyricsBadge').innerHTML = '<i></i> LETRA COMPLETA · RECORRIDO CONTINUO';
+      $('#lyricsKicker').textContent = 'LETRA COMPLETA · MODO TEXTO';
+      $('#lyricsHeading').textContent = 'La letra recorre toda la canción sin simular tiempos.';
+      setLyricMode('full', changed);
+      return;
+    }
+
+    if (!compatible) {
+      const delta = Math.abs(videoDuration - lyricDuration).toFixed(1);
+      $('#lyricsBadge').innerHTML = '<i></i> DURACIÓN DISTINTA · TEXTO';
+      $('#lyricsKicker').textContent = `VIDEO Y LETRA DIFIEREN ${delta} S`;
+      $('#lyricsHeading').textContent = 'Buscando una edición que coincida exactamente…';
+      setLyricMode('full', changed);
+      maybeRecoverDurationMatch();
+      return;
+    }
+
+    $('#lyricsBadge').innerHTML = '<i></i> LETRA SINCRONIZADA';
+    $('#lyricsKicker').textContent = 'TIEMPOS LRC · ESCENA CINÉTICA';
+    $('#lyricsHeading').textContent = 'Cada línea entra un segundo antes para acompañar la voz.';
+    if (wasForced && changed) setLyricMode('cinematic');
+  }
+
+  function maybeRecoverDurationMatch() {
+    const track = state.currentTrack;
+    if (!track || !youtubeApiKey || state.durationRecoveryTried) return;
+    if (state.youtubeLookupPending) {
+      clearTimeout(state.durationRecoveryTimer);
+      state.durationRecoveryTimer = setTimeout(() => {
+        state.durationRecoveryTimer = null;
+        if (state.currentTrack === track) maybeRecoverDurationMatch();
+      }, 650);
+      return;
+    }
+    state.durationRecoveryTried = true;
+    enrichCurrentTrackWithYouTube(track, true, state.lyricReferenceDuration * 1000);
   }
 
   function visualFrameDelay() {
@@ -1744,6 +1930,7 @@
 
   function updateLyricUI(forceScroll = false) {
     if (!state.lyrics.length) return;
+    const shouldHighlight = state.exactSyncAvailable && state.lyricMode !== 'full';
     let activeIndex = 0;
     for (let i = 0; i < state.lyrics.length; i++) {
       if (state.lyrics[i].time <= state.lyricTime) activeIndex = i;
@@ -1753,9 +1940,9 @@
     const lineChanged = activeIndex !== state.activeLyricIndex;
     if (lineChanged) {
       state.lyricElements.forEach((line, index) => {
-        line.classList.toggle('active', index === activeIndex);
-        line.classList.toggle('past', index < activeIndex);
-        line.classList.toggle('upcoming', index > activeIndex);
+        line.classList.toggle('active', shouldHighlight && index === activeIndex);
+        line.classList.toggle('past', shouldHighlight && index < activeIndex);
+        line.classList.toggle('upcoming', shouldHighlight && index > activeIndex);
       });
       state.activeLyricIndex = activeIndex;
       const current = state.lyrics[activeIndex]?.text || '♪';
@@ -1767,7 +1954,7 @@
     const lineSpan = Math.max(.4, nextTime - state.lyrics[activeIndex].time);
     const lineProgress = Math.max(0, Math.min(1, (state.lyricTime - state.lyrics[activeIndex].time) / lineSpan));
     const activeLine = state.lyricElements[activeIndex];
-    if (activeLine) {
+    if (activeLine && shouldHighlight) {
       const tokens = $$('.lyric-token', activeLine);
       tokens.forEach((token, index) => {
         const tokenStart = index / Math.max(tokens.length, 1);
@@ -1778,22 +1965,38 @@
         token.classList.toggle('singing', progress > 0 && progress < .98);
       });
       activeLine.style.setProperty('--line-progress', lineProgress.toFixed(3));
+    } else if (!shouldHighlight && lineChanged) {
+      clearLyricHighlights();
     }
 
     const active = state.lyricElements[activeIndex];
-    if (active && (forceScroll || lineChanged) && ['flow', 'full'].includes(state.lyricMode)) {
-      const anchor = state.lyricMode === 'full' ? .28 : .5;
+    if (!state.exactSyncAvailable && state.lyricMode === 'full') {
+      const maxScroll = Math.max(0, els.lyricsViewport.scrollHeight - els.lyricsViewport.clientHeight);
+      els.lyricsViewport.scrollTop = maxScroll * playbackProgress();
+    } else if (active && (forceScroll || lineChanged) && state.lyricMode === 'flow') {
+      const anchor = .5;
       const target = active.offsetTop - els.lyricsViewport.clientHeight * anchor + active.offsetHeight / 2;
       els.lyricsViewport.scrollTo({ top: Math.max(0, target), behavior: state.motion ? 'smooth' : 'auto' });
     }
 
-    const progress = state.lyricDuration ? Math.min(100, state.lyricTime / state.lyricDuration * 100) : 0;
+    const progress = playbackProgress() * 100;
     els.lyricScrubber.value = String(progress);
     els.lyricScrubber.style.setProperty('--progress', `${progress}%`);
     els.lyricTime.textContent = formatTime(state.lyricTime);
     updateBeatVisual(state.lyricTime);
 
     if (state.lyricTime >= state.lyricDuration && state.lyricPlaying) finishCinema();
+  }
+
+  function playbackProgress() {
+    const playerTime = Number(state.youtubePlayer?.getCurrentTime?.());
+    const playerDuration = Number(state.youtubeDuration || state.youtubePlayer?.getDuration?.());
+    if (Number.isFinite(playerTime) && playerDuration >= 10) {
+      return Math.max(0, Math.min(1, playerTime / playerDuration));
+    }
+    return state.lyricDuration
+      ? Math.max(0, Math.min(1, state.lyricTime / state.lyricDuration))
+      : 0;
   }
 
   function toggleLyricPlayback() {
@@ -1893,16 +2096,122 @@
     const now = performance.now();
     if (now - state.beatPaintAt < visualFrameDelay() * .9) return;
     state.beatPaintAt = now;
-    if (state.audioAnalyser && state.audioData && !els.audio.paused) state.audioAnalyser.getByteFrequencyData(state.audioData);
-    const audioEnergy = els.audio.paused ? 0 : .18 + Math.abs(Math.sin(els.audio.currentTime * 5.6)) * .58;
+    const hasLiveAudio = Boolean(state.audioAnalyser && state.audioData && !els.audio.paused);
+    if (hasLiveAudio) state.audioAnalyser.getByteFrequencyData(state.audioData);
+    const liveAverage = hasLiveAudio
+      ? state.audioData.reduce((sum, value) => sum + value, 0) / Math.max(1, state.audioData.length) / 255
+      : 0;
+    const progress = playbackProgress();
+    const envelopeEnergy = sampleEnergyEnvelope(progress);
     const bars = state.beatBars;
     bars.forEach((bar, index) => {
-      const wave = Math.abs(Math.sin(time * (2.1 + index % 5 * .13) + index * .72));
-      const kick = Math.pow(Math.max(0, Math.sin(time * 3.25 - index * .08)), 6);
-      const liveBin = state.audioData?.length ? state.audioData[Math.min(state.audioData.length - 1, Math.floor(index / bars.length * state.audioData.length))] / 255 : 0;
-      const energy = Math.min(1, .08 + wave * .24 + kick * .62 + audioEnergy * .2 + liveBin * .72);
+      const liveBin = hasLiveAudio
+        ? state.audioData[Math.min(state.audioData.length - 1, Math.floor(index / bars.length * state.audioData.length))] / 255
+        : 0;
+      const texture = smoothNoise(state.energySeed + index * 97, progress * 42 + index * .17);
+      const sourceEnergy = hasLiveAudio ? liveAverage * .45 + liveBin * .75 : envelopeEnergy;
+      const energy = Math.min(1, .045 + sourceEnergy * (.55 + texture * .58));
       bar.style.setProperty('--beat', energy.toFixed(3));
     });
+  }
+
+  function prepareTrackEnergy(track) {
+    state.energyController?.abort();
+    const controller = new AbortController();
+    state.energyController = controller;
+    state.energyTrackId = trackId(track);
+    state.energySeed = stringSeed(`${canonicalArtist(track.artist)}|${canonicalTitle(track.title)}`);
+    state.energyEnvelope = buildEnergyEnvelope(state.energySeed, 96);
+    const canAnalyzePreview = track.previewUrl
+      && !state.performanceLite
+      && !navigator.connection?.saveData;
+    if (!canAnalyzePreview) return;
+    const start = () => analyzePreviewEnergy(track, controller).catch(error => {
+      if (error.name !== 'AbortError') console.info('Preview intensity unavailable; using song profile', error);
+    });
+    if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1600 });
+    else setTimeout(start, 350);
+  }
+
+  async function analyzePreviewEnergy(track, controller) {
+    const response = await fetchWithDeadline(track.previewUrl, { signal: controller.signal }, 9000);
+    if (!response.ok) throw new Error(`Preview intensity failed ${response.status}`);
+    const buffer = await response.arrayBuffer();
+    if (controller.signal.aborted) return;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const context = new AudioContextClass();
+    try {
+      const audioBuffer = await context.decodeAudioData(buffer.slice(0));
+      const envelope = rmsEnvelope(audioBuffer, 96);
+      if (!controller.signal.aborted && state.currentTrack === track && envelope.length) {
+        state.energyEnvelope = envelope;
+      }
+    } finally {
+      context.close?.().catch?.(() => {});
+    }
+  }
+
+  function rmsEnvelope(audioBuffer, bins) {
+    const channels = Array.from({ length: audioBuffer.numberOfChannels }, (_, index) => audioBuffer.getChannelData(index));
+    const samplesPerBin = Math.max(1, Math.floor(audioBuffer.length / bins));
+    const values = Array.from({ length: bins }, (_, bin) => {
+      const start = bin * samplesPerBin;
+      const end = Math.min(audioBuffer.length, start + samplesPerBin);
+      const stride = Math.max(1, Math.floor((end - start) / 420));
+      let sum = 0;
+      let count = 0;
+      for (let sample = start; sample < end; sample += stride) {
+        let mixed = 0;
+        channels.forEach(channel => { mixed += channel[sample] || 0; });
+        mixed /= Math.max(1, channels.length);
+        sum += mixed * mixed;
+        count += 1;
+      }
+      return Math.sqrt(sum / Math.max(1, count));
+    });
+    const peak = Math.max(...values, .001);
+    return values.map(value => Math.max(.06, Math.min(1, Math.pow(value / peak, .72))));
+  }
+
+  function buildEnergyEnvelope(seed, bins) {
+    let energy = .24 + seededUnit(seed) * .18;
+    return Array.from({ length: bins }, (_, index) => {
+      const section = index / Math.max(1, bins - 1);
+      const drift = (seededUnit(seed + index * 31) - .5) * .22;
+      const arc = section < .12 ? section * 1.9 : section > .9 ? (1 - section) * 1.4 : .24;
+      energy = Math.max(.08, Math.min(.88, energy * .72 + (.2 + arc + drift) * .28));
+      return energy;
+    });
+  }
+
+  function sampleEnergyEnvelope(progress) {
+    const values = state.energyEnvelope;
+    if (!values.length) return .18;
+    const position = Math.max(0, Math.min(1, progress)) * (values.length - 1);
+    const left = Math.floor(position);
+    const mix = position - left;
+    return values[left] * (1 - mix) + values[Math.min(values.length - 1, left + 1)] * mix;
+  }
+
+  function smoothNoise(seed, position) {
+    const left = Math.floor(position);
+    const mix = position - left;
+    const eased = mix * mix * (3 - 2 * mix);
+    return seededUnit(seed + left * 131) * (1 - eased) + seededUnit(seed + (left + 1) * 131) * eased;
+  }
+
+  function seededUnit(value) {
+    let hash = Number(value) | 0;
+    hash = Math.imul(hash ^ (hash >>> 16), 0x45d9f3b);
+    hash = Math.imul(hash ^ (hash >>> 16), 0x45d9f3b);
+    return ((hash ^ (hash >>> 16)) >>> 0) / 4294967295;
+  }
+
+  function stringSeed(value) {
+    let hash = 2166136261;
+    for (const char of String(value)) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+    return hash >>> 0;
   }
 
   function startBeatLoop() {
@@ -2359,11 +2668,11 @@
       return Boolean(record.syncedLyrics || record.plainLyrics);
     });
     if (!candidates.length) return null;
-    return candidates.sort((a, b) => {
+    const best = candidates.sort((a, b) => {
       const score = record => {
         let value = 0;
         const durationDelta = wantedDuration && record.duration ? Math.abs(Number(record.duration) - wantedDuration) : 0;
-        if (record.syncedLyrics && (!wantedDuration || !record.duration || durationDelta <= 75)) value += 6;
+        if (record.syncedLyrics && (!wantedDuration || !record.duration || durationDelta <= SYNC_DURATION_TOLERANCE_SECONDS)) value += 100;
         if (record.plainLyrics) value += 3;
         if (artistsMatch(wantedArtist, canonicalArtist(record.artistName))) value += 5;
         if (normalizeText(record.albumName) === normalizeText(track.album)) value += 3;
@@ -2372,6 +2681,11 @@
       };
       return score(b) - score(a);
     })[0];
+    const bestDuration = Number(best?.duration || 0);
+    if (best?.syncedLyrics && wantedDuration && bestDuration && !durationsCompatible(wantedDuration, bestDuration)) {
+      return { ...best, syncedLyrics: '', plainLyrics: best.plainLyrics || stripLrc(best.syncedLyrics) };
+    }
+    return best;
   }
 
   function artistsMatch(left, right) {

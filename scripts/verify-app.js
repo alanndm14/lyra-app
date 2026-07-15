@@ -17,7 +17,7 @@ for (const id of ['entryGate', 'appShell', 'chartList', 'playerOverlay', 'beatSt
   assert(ids.includes(id), `Missing required UI id: ${id}`);
 }
 
-assert(html.includes('styles.css?v=15') && html.includes('app.js?v=15') && html.includes('runtime-config.js?v=15'), 'Public asset versions are not aligned');
+assert(html.includes('styles.css?v=16') && html.includes('app.js?v=16') && html.includes('runtime-config.js?v=16'), 'Public asset versions are not aligned');
 assert(app.includes(".join(' ')}<small class=\"lyric-translation\""), 'Lyric words are rendered without explicit spaces');
 assert(app.includes('itunes.apple.com/lookup?'), 'Chart entries are not resolved through exact catalog lookup');
 assert(app.includes('googleapis.com/youtube/v3/search'), 'YouTube search fallback is missing');
@@ -36,11 +36,11 @@ assert(app.includes('api.mymemory.translated.net/get'), 'Lyrics translation prov
 assert(app.includes('translate.googleapis.com/translate_a/single') && app.includes('requestMyMemoryTranslation'), 'Translation provider failover is missing');
 assert(app.includes("writeStore('lyra:preview-offsets'"), 'Per-track preview alignment is not persisted');
 assert(!app.includes("text: 'Esta letra todavía no está disponible.'"), 'A placeholder is still being animated as lyrics');
-assert(css.includes('repeat(var(--beat-columns,48)') && app.includes('state.performanceLite ? 18 : 48'), 'Adaptive full-width beat stage is missing');
+assert(css.includes('repeat(var(--beat-columns,32)') && app.includes('state.performanceLite ? 16 : 32'), 'Adaptive full-width beat stage is missing');
 assert(css.includes('.no-lyrics'), 'The no-lyrics visual state is missing');
 assert(css.includes('--lyric-hot') && css.includes('.lyric-translation'), 'Artwork-colored translated lyrics styling is missing');
 assert(html.includes('data-view="history"'), 'Mobile history navigation is missing');
-assert(app.includes('state.visualFps = state.performanceLite ? 24 : 36') && app.includes('setTimeout(tick, visualFrameDelay())'), 'Playback rendering is not frame-capped');
+assert(app.includes('state.visualFps = state.performanceLite ? 20 : 30') && app.includes('setTimeout(tick, visualFrameDelay())'), 'Playback rendering is not frame-capped');
 assert(app.includes("const mobile = matchMedia('(pointer:coarse)')") && css.includes('body.performance-lite #particleCanvas'), 'Mobile performance profile is not automatic');
 assert(app.includes('videoToLyricTime(currentTime)') && app.includes('lyricToVideoTime(state.lyricTime)'), 'Video and lyric duration mapping is missing');
 assert(app.includes('requestBrowserTranslation') && app.includes('requestNetworkTranslation') && app.includes('translationRetryCount'), 'Translation fallbacks are incomplete');
@@ -51,10 +51,14 @@ assert(app.includes("mode === 'artist' ? ['artistTerm']") && app.includes('passe
 assert(app.includes("mode === 'song' ? ['songTerm', '']") && app.includes('modeMatchScore(track, query, mode)'), 'Song filter does not prioritize titles');
 assert(app.includes("entity: 'song',") && app.includes('albumsByMarket'), 'Album tracks are not loaded from the selected collections');
 assert(app.includes('api.lyrics.ovh/v1/') && app.includes('lyricTitleVariants'), 'Plain-lyrics provider fallback is missing');
-assert(app.includes("if (!data.syncedLyrics) setLyricMode('full')") && css.includes('.player-overlay.plain-lyrics .lyrics-panel'), 'Unsynced lyrics do not degrade to a visible text layout');
+assert(app.includes("if (!state.exactSyncAvailable) setLyricMode('full')") && css.includes('.player-overlay.plain-lyrics .lyrics-panel'), 'Unsynced lyrics do not degrade to a visible text layout');
 assert((app.match(/if \(data\?\.syncedLyrics \|\| data\?\.plainLyrics\) state\.lyricsCache\.set/g) || []).length === 2, 'Negative lyric results can still poison the session cache');
-assert(app.includes('durationDelta <= 75') && app.includes('canonicalArtist'), 'Lyrics matching is too strict for live versions');
-assert(app.includes("['flow', 'full'].includes(state.lyricMode)"), 'Full-text lyrics do not follow estimated playback timing');
+assert(app.includes('SYNC_DURATION_TOLERANCE_SECONDS = 4') && app.includes('durationsCompatible'), 'Video and lyric duration tolerance is not strict enough');
+assert(app.includes('youtubeIdentityKey') && app.includes('youtubeSearchQueries') && app.includes('pickYouTubeMatch'), 'Equivalent metadata does not share tolerant YouTube matching');
+assert(app.includes('(Number(videoTime || 0) + lead)') && app.includes('LYRIC_LEAD_SECONDS = 1'), 'Synced lyrics are not led by one second');
+assert(app.includes("state.lyricMode !== 'full'") && app.includes('clearLyricHighlights'), 'Text mode can still animate lyric highlighting');
+assert(app.includes('maxScroll * playbackProgress()'), 'Unsynced lyrics do not scroll across the complete playback duration');
+assert(app.includes('rmsEnvelope') && app.includes('sampleEnergyEnvelope') && !app.includes('const wave = Math.abs(Math.sin'), 'Beat bars still use a repeating synthetic loop');
 
 const markets = Object.entries(chartBundle.charts || {});
 assert(markets.length >= 8, 'Expected global plus seven country charts');

@@ -1,7 +1,7 @@
 'use strict';
 
 const baseline = { bars: 48, fps: 60, particleLoops: 1 };
-const mobile = { bars: 18, fps: 24, particleLoops: 0 };
+const mobile = { bars: 16, fps: 20, particleLoops: 0 };
 
 const baselineWrites = baseline.bars * baseline.fps;
 const mobileWrites = mobile.bars * mobile.fps;
